@@ -1,0 +1,6 @@
+{
+  "name": "CPA Review Wheel - Study & Topic Picker",
+  "description": "Cutesy CPALE board exam topic spinning wheels for FAR, AFAR, RFBT, TAX, MAS, and AUD with mastery tracking, reviewer cheat sheets, and confetti.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

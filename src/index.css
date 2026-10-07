@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  h1, h2, h3, h4, .font-cute {
+    font-family: 'Fredoka', cursive, system-ui, sans-serif;
+  }
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Custom cute animations and scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FFF1F2;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb {
+  background: #FDA4AF;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #F43F5E;
+}
+
+@keyframes bounceSlow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounceSlow 3s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(244, 63, 94, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(244, 63, 94, 0.7);
+  }
+}
+
+.glow-cute {
+  animation: pulseGlow 2.5s infinite;
+}
