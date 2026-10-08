@@ -579,10 +579,13 @@
 
         <div class="drawer-body" id="drawerBody">
           <!-- Search & Add -->
-          <div style="display:flex; gap:0.5rem;">
-            <input type="text" id="topicSearchInput" class="search-input" placeholder="Search topics, laws, formulas...">
-            <button id="openAddTopicBtn" class="btn-tool font-cute" style="background:#F43F5E; color:#FFF; border:none; padding:0.45rem 1rem;">
+          <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+            <input type="text" id="topicSearchInput" class="search-input" style="flex:1; min-width:180px;" placeholder="Search topics, laws, formulas...">
+            <button id="openAddTopicBtn" class="btn-tool font-cute" style="background:#F43F5E; color:#FFF; border:none; padding:0.45rem 0.85rem;" title="Add a single topic">
               + Add
+            </button>
+            <button id="openBatchInsertBtn" class="btn-tool font-cute" style="background:#8B5CF6; color:#FFF; border:none; padding:0.45rem 0.85rem;" title="Batch insert multiple topics separated by line">
+              📑 Batch Insert
             </button>
           </div>
 
@@ -595,24 +598,50 @@
             <button class="pill-btn" data-filter="comfortable">🌿 Comfortable (<span id="countComfortable">0</span>)</button>
           </div>
 
-          <!-- Add Topic Form (hidden by default) -->
-          <div id="addTopicFormCard" style="display:none; background:#FFF1F2; padding:1rem; border-radius:18px; border:2px dashed #FDA4AF; flex-direction:column; gap:0.65rem;">
+          <!-- Add Topic / Batch Insert Card (hidden by default) -->
+          <div id="addTopicFormCard" style="display:none; background:#FFF1F2; padding:1.15rem; border-radius:20px; border:2px dashed #FDA4AF; flex-direction:column; gap:0.75rem;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span class="font-cute" style="font-size:0.85rem; font-weight:700; color:#9F1239;">Add Custom Topic to Wheel:</span>
-              <button id="closeAddTopicBtn" style="border:none; background:transparent; cursor:pointer; color:#9F1239; font-weight:bold;">✕</button>
+              <div style="display:flex; gap:0.4rem;">
+                <button type="button" id="tabModeSingleBtn" class="pill-btn active" style="font-size:0.75rem;">Single Topic</button>
+                <button type="button" id="tabModeBatchBtn" class="pill-btn" style="font-size:0.75rem;">📑 Batch Insert (Line-by-Line)</button>
+              </div>
+              <button id="closeAddTopicBtn" style="border:none; background:transparent; cursor:pointer; color:#9F1239; font-weight:bold; font-size:1.1rem; padding:0 0.35rem;">✕</button>
             </div>
-            <input type="text" id="newTopicTitle" class="search-input" style="background:#FFF;" placeholder="Topic title (e.g. VAT on Services, PFRS 15...)">
-            <input type="text" id="newTopicCategory" class="search-input" style="background:#FFF;" placeholder="Category (optional)">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
+
+            <!-- Single Topic Fields -->
+            <div id="singleTopicFields" style="display:flex; flex-direction:column; gap:0.6rem;">
+              <input type="text" id="newTopicTitle" class="search-input" style="background:#FFF;" placeholder="Topic title (e.g. VAT on Services, PFRS 15...)">
+              <input type="text" id="newTopicCategory" class="search-input" style="background:#FFF;" placeholder="Category (optional, e.g. Tax Remedies)">
+            </div>
+
+            <!-- Batch Insert Fields -->
+            <div id="batchTopicFields" style="display:none; flex-direction:column; gap:0.5rem;">
+              <div style="font-size:0.75rem; color:#831843; font-weight:600;">
+                Paste or type topics below, <strong>one topic per line</strong>:
+              </div>
+              <textarea id="batchTopicsTextarea" rows="5" class="search-input font-mono" style="background:#FFF; resize:vertical; line-height:1.4;" placeholder="Local tax
+Tax remedies.
+BIR form deadlines
+Estate tax deductions"></textarea>
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; color:#9F1239;">
+                <span id="batchCountBadge" style="font-weight:700;">0 topics detected</span>
+                <span style="opacity:0.8;">Empty lines are ignored automatically</span>
+              </div>
+              <input type="text" id="batchCategoryInput" class="search-input" style="background:#FFF;" placeholder="Common Category for batch (optional, e.g. Batch Reviewer)">
+            </div>
+
+            <!-- Common Options & Submit Button -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; padding-top:0.25rem;">
               <div style="display:flex; gap:0.35rem; align-items:center; font-size:0.75rem;">
-                <span>Tag:</span>
-                <select id="newTopicTagSelect" style="padding:0.25rem 0.5rem; border-radius:8px; border:1px solid #FDA4AF; font-size:0.75rem;">
+                <span style="font-weight:700; color:#475569;">Tag:</span>
+                <select id="newTopicTagSelect" style="padding:0.3rem 0.5rem; border-radius:10px; border:1px solid #FDA4AF; font-size:0.75rem; background:#FFF;">
                   <option value="none">Normal</option>
                   <option value="critical">🚨 Critical</option>
                   <option value="comfortable">🌿 Comfortable</option>
+                  <option value="reviewing">📖 Reviewing</option>
                 </select>
               </div>
-              <button id="submitNewTopicBtn" class="btn-tool font-cute" style="background:#E11D48; color:#FFF; border:none; padding:0.4rem 1rem;">
+              <button id="submitNewTopicBtn" class="btn-tool font-cute" style="background:#E11D48; color:#FFF; border:none; padding:0.45rem 1.25rem; font-size:0.85rem;">
                 Add to Wheel ✨
               </button>
             </div>
@@ -3312,42 +3341,150 @@
         });
       });
 
-      // Add topic form toggle
+      // Add topic form mode: 'single' | 'batch'
+      let addTopicMode = 'single';
+      const singleFields = document.getElementById('singleTopicFields');
+      const batchFields = document.getElementById('batchTopicFields');
+      const tabSingleBtn = document.getElementById('tabModeSingleBtn');
+      const tabBatchBtn = document.getElementById('tabModeBatchBtn');
+      const batchTextarea = document.getElementById('batchTopicsTextarea');
+      const batchCountBadge = document.getElementById('batchCountBadge');
+      const submitAddBtn = document.getElementById('submitNewTopicBtn');
+
+      function setAddTopicMode(mode) {
+        addTopicMode = mode;
+        if (mode === 'single') {
+          singleFields.style.display = 'flex';
+          batchFields.style.display = 'none';
+          tabSingleBtn.classList.add('active');
+          tabBatchBtn.classList.remove('active');
+          submitAddBtn.textContent = 'Add to Wheel ✨';
+        } else {
+          singleFields.style.display = 'none';
+          batchFields.style.display = 'flex';
+          tabSingleBtn.classList.remove('active');
+          tabBatchBtn.classList.add('active');
+          updateBatchCounter();
+        }
+      }
+
+      function updateBatchCounter() {
+        const text = batchTextarea.value;
+        const validLines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+        const count = validLines.length;
+        batchCountBadge.textContent = count === 1 ? '1 topic detected' : `${count} topics detected`;
+        submitAddBtn.textContent = count > 0 ? `Insert ${count} Topics ✨` : 'Insert Batch Topics ✨';
+      }
+
+      tabSingleBtn.addEventListener('click', () => {
+        sounds.playPop();
+        setAddTopicMode('single');
+      });
+
+      tabBatchBtn.addEventListener('click', () => {
+        sounds.playPop();
+        setAddTopicMode('batch');
+      });
+
+      batchTextarea.addEventListener('input', updateBatchCounter);
+
+      // Add topic form toggles
       document.getElementById('openAddTopicBtn').addEventListener('click', () => {
         sounds.playPop();
         document.getElementById('addTopicFormCard').style.display = 'flex';
+        setAddTopicMode('single');
       });
+
+      document.getElementById('openBatchInsertBtn').addEventListener('click', () => {
+        sounds.playPop();
+        document.getElementById('addTopicFormCard').style.display = 'flex';
+        setAddTopicMode('batch');
+        batchTextarea.focus();
+      });
+
       document.getElementById('closeAddTopicBtn').addEventListener('click', () => {
         document.getElementById('addTopicFormCard').style.display = 'none';
       });
 
-      // Add topic submit
-      document.getElementById('submitNewTopicBtn').addEventListener('click', () => {
-        const title = document.getElementById('newTopicTitle').value.trim();
-        const category = document.getElementById('newTopicCategory').value.trim() || 'Custom Added';
+      // Add topic submit handler (handles both single and batch!)
+      submitAddBtn.addEventListener('click', () => {
         const label = document.getElementById('newTopicTagSelect').value;
 
-        if (!title) return;
-        sounds.playPop();
+        if (addTopicMode === 'single') {
+          const title = document.getElementById('newTopicTitle').value.trim();
+          const category = document.getElementById('newTopicCategory').value.trim() || 'Custom Added';
 
-        const newItem = {
-          id: activeSubjectId.toLowerCase() + '-custom-' + Date.now(),
-          title,
-          category,
-          mastered: false,
-          label,
-          notes: '',
-          keyPoints: ['Custom study topic added by reviewee.'],
-          addedByUser: true,
-        };
+          if (!title) {
+            alert('Please enter a topic title!');
+            return;
+          }
+          sounds.playPop();
 
-        allTopics[activeSubjectId].unshift(newItem);
-        document.getElementById('newTopicTitle').value = '';
-        document.getElementById('newTopicCategory').value = '';
-        document.getElementById('addTopicFormCard').style.display = 'none';
+          const newItem = {
+            id: activeSubjectId.toLowerCase() + '-custom-' + Date.now(),
+            title,
+            category,
+            mastered: false,
+            label,
+            notes: '',
+            keyPoints: ['Custom study topic added by reviewee.'],
+            addedByUser: true,
+          };
 
-        saveState();
-        renderAll();
+          allTopics[activeSubjectId].unshift(newItem);
+          document.getElementById('newTopicTitle').value = '';
+          document.getElementById('newTopicCategory').value = '';
+          document.getElementById('addTopicFormCard').style.display = 'none';
+
+          saveState();
+          renderAll();
+        } else {
+          // Batch Insert Mode: separated by line
+          const rawText = batchTextarea.value;
+          const rawLines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+
+          if (rawLines.length === 0) {
+            alert('Please paste or type at least one topic (one per line).');
+            return;
+          }
+
+          sounds.playCelebration();
+          confetti.fire();
+
+          const commonCat = document.getElementById('batchCategoryInput').value.trim() || 'Batch Added';
+          const now = Date.now();
+
+          const newItems = rawLines.map((line, idx) => {
+            // Clean optional leading bullets/numbers e.g. "- Topic" or "1. Topic"
+            let cleanTitle = line.replace(/^[-*•\d+.]\s*/, '').trim();
+            if (!cleanTitle) cleanTitle = line;
+
+            return {
+              id: `${activeSubjectId.toLowerCase()}-batch-${now}-${idx}`,
+              title: cleanTitle,
+              category: commonCat,
+              mastered: false,
+              label,
+              notes: '',
+              keyPoints: [`Topic added in batch: ${cleanTitle}`],
+              addedByUser: true,
+            };
+          });
+
+          // Prepend all new batch items to the active subject topics
+          allTopics[activeSubjectId] = [...newItems, ...allTopics[activeSubjectId]];
+
+          // Reset batch inputs
+          batchTextarea.value = '';
+          document.getElementById('batchCategoryInput').value = '';
+          document.getElementById('addTopicFormCard').style.display = 'none';
+
+          saveState();
+          renderAll();
+
+          // Quick friendly alert
+          alert(`Success! Inserted ${newItems.length} topics into the ${activeSubjectId} wheel! 🎉`);
+        }
       });
 
       // Reset subject mastery
