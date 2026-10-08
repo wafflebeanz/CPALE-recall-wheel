@@ -1,21 +1,3501 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CPA Review Wheel - Study & Topic Picker</title>
-    <meta name="description" content="Cutesy CPALE board exam topic spinning wheels for FAR, AFAR, RFBT, TAX, MAS, and AUD with mastery tracking, reviewer cheat sheets, and confetti." />
-    <meta property="og:title" content="CPA Review Wheel - Study & Topic Picker" />
-    <meta property="og:description" content="Cutesy CPALE board exam topic spinning wheels for FAR, AFAR, RFBT, TAX, MAS, and AUD with mastery tracking, reviewer cheat sheets, and confetti." />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  </head>
-  <body class="bg-[#FFF8F0] text-slate-800 antialiased selection:bg-pink-200 selection:text-pink-900">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPA Review Wheel - Study & Topic Picker</title>
+  <meta name="description" content="Cutesy CPALE board exam topic spinning wheels for FAR, AFAR, RFBT, TAX, MAS, and AUD with mastery tracking, reviewer cheat sheets, and confetti.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #FFFDF9;
+      --card-bg: #FFFFFF;
+      --text-main: #1E293B;
+      --text-muted: #64748B;
+      --border-pink: #FCE7F3;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Nunito', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-cream);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    h1, h2, h3, h4, .font-cute {
+      font-family: 'Fredoka', cursive, sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Layout */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      width: 100%;
+    }
+    /* Header */
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      border-bottom: 1px solid #FCE7F3;
+      box-shadow: 0 2px 10px rgba(244, 63, 94, 0.05);
+    }
+    .header-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #F43F5E, #EC4899, #8B5CF6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+    }
+    .badge-pill {
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      background: #FCE7F3;
+      color: #BE185D;
+      border: 1px solid #FBCFE8;
+      display: inline-block;
+    }
+    .tools-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-tool {
+      background: #FFF;
+      border: 1px solid #E2E8F0;
+      padding: 0.45rem 0.85rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: #475569;
+      transition: all 0.2s;
+    }
+    .btn-tool:hover {
+      background: #F8FAFC;
+      border-color: #CBD5E1;
+    }
+    .btn-tool.active {
+      background: #FEF3C7;
+      color: #92400E;
+      border-color: #FCD34D;
+    }
+    /* Tabs */
+    .tabs-bar {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding: 0.25rem 0 0.65rem 0;
+      scrollbar-width: none;
+    }
+    .tabs-bar::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex-shrink: 0;
+      padding: 0.55rem 1rem;
+      border-radius: 16px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.7);
+      border: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #64748B;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover {
+      background: #FFF;
+      border-color: #E2E8F0;
+    }
+    .tab-btn.active {
+      background: #FFF;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+      transform: translateY(-2px);
+    }
+    /* Subject Banner */
+    .subject-banner {
+      border-radius: 24px;
+      padding: 1.5rem;
+      color: #FFF;
+      margin: 1.5rem 0 1rem 0;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      box-shadow: 0 15px 30px -8px rgba(0, 0, 0, 0.15);
+    }
+    @media (min-width: 768px) {
+      .subject-banner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+    .quote-box {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      padding: 0.85rem 1.15rem;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      font-size: 0.78rem;
+      max-width: 380px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .quote-box:hover {
+      background: rgba(255, 255, 255, 0.28);
+    }
+    /* Progress Bar */
+    .overall-progress-card {
+      background: #FFF;
+      border-radius: 18px;
+      padding: 0.9rem 1.25rem;
+      border: 1px solid var(--border-pink);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    @media (min-width: 640px) {
+      .overall-progress-card {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+    .progress-track {
+      flex: 1;
+      height: 10px;
+      background: #F1F5F9;
+      border-radius: 9999px;
+      overflow: hidden;
+      max-width: 280px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #F43F5E, #A855F7);
+      border-radius: 9999px;
+      transition: width 0.4s ease;
+    }
+    /* Main Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    @media (min-width: 1024px) {
+      .main-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    /* Wheel Box */
+    .wheel-card {
+      background: #FFF;
+      border-radius: 28px;
+      padding: 1.5rem;
+      border: 1px solid var(--border-pink);
+      box-shadow: 0 12px 35px -5px rgba(244, 63, 94, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .wheel-canvas-container {
+      position: relative;
+      margin: 0.5rem auto 1.25rem auto;
+      cursor: pointer;
+    }
+    canvas#wheelCanvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 50%;
+      display: block;
+    }
+    .spin-main-btn {
+      padding: 0.85rem 2.25rem;
+      border-radius: 18px;
+      color: #FFF;
+      font-size: 1.15rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 10px 25px -4px rgba(244, 63, 94, 0.4);
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+    .spin-main-btn:hover {
+      transform: translateY(-2px);
+    }
+    .spin-main-btn:active {
+      transform: translateY(1px);
+    }
+    .spin-main-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    /* Drawer & Checklist */
+    .drawer-card {
+      background: #FFF;
+      border-radius: 28px;
+      border: 1px solid var(--border-pink);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+    .drawer-header {
+      padding: 1.15rem 1.25rem;
+      background: linear-gradient(135deg, #FFF1F2, #FAF5FF, #FFF);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+    .drawer-body {
+      padding: 1.25rem;
+      border-top: 1px solid #F1F5F9;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .drawer-body.collapsed {
+      display: none;
+    }
+    .search-input {
+      width: 100%;
+      padding: 0.65rem 1rem;
+      border-radius: 14px;
+      border: 1px solid #E2E8F0;
+      background: #F8FAFC;
+      font-size: 0.82rem;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: #F43F5E;
+      background: #FFF;
+      box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);
+    }
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .pill-btn {
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border: 1px solid #E2E8F0;
+      background: #F8FAFC;
+      cursor: pointer;
+      color: #64748B;
+      transition: all 0.15s;
+    }
+    .pill-btn.active {
+      background: #1E293B;
+      color: #FFF;
+      border-color: #1E293B;
+    }
+    .topic-list-scroll {
+      max-height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      padding-right: 0.35rem;
+    }
+    .topic-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 0.75rem;
+      border-radius: 14px;
+      background: #FFF;
+      border: 1px solid #F1F5F9;
+      transition: background 0.15s;
+    }
+    .topic-row:hover {
+      background: #FFF7F8;
+      border-color: #FFE4E6;
+    }
+    .topic-row.mastered {
+      opacity: 0.55;
+      background: #F8FAFC;
+    }
+    .topic-row.mastered .topic-title {
+      text-decoration: line-through;
+      color: #94A3B8;
+    }
+    .topic-checkbox {
+      width: 18px;
+      height: 18px;
+      accent-color: #F43F5E;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .tag-critical {
+      background: #FFE4E6;
+      color: #BE123C;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+    }
+    .tag-comfortable {
+      background: #CCFBF1;
+      color: #0F766E;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+    }
+    .tag-reviewing {
+      background: #F3E8FF;
+      color: #7E22CE;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.15rem 0.5rem;
+      border-radius: 6px;
+    }
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-card {
+      background: #FFF;
+      width: 100%;
+      max-width: 520px;
+      border-radius: 28px;
+      border: 4px solid #F43F5E;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(0,0,0,0.3);
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.95);
+      transition: transform 0.25s ease;
+    }
+    .modal-backdrop.open .modal-card {
+      transform: scale(1);
+    }
+    .modal-header {
+      padding: 1.25rem;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-body {
+      padding: 1.25rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .modal-footer {
+      padding: 1rem 1.25rem;
+      background: #F8FAFC;
+      border-top: 1px solid #E2E8F0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    /* Canvas Confetti */
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <div class="header-top">
+        <div class="logo-area">
+          <div class="logo-icon">🌸</div>
+          <div>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <h1 class="font-cute" style="font-size:1.4rem; color:#1E293B;">CPA Review Wheel</h1>
+              <span class="badge-pill">CPALE 2026 Ready</span>
+            </div>
+            <p style="font-size:0.75rem; color:#64748B;">Comprehensive 6-subject Philippine CPA reviewer topic wheels ✨</p>
+          </div>
+        </div>
 
+        <div class="tools-toolbar">
+          <button id="toggleFastSpinBtn" class="btn-tool" title="Skip spin animation">
+            <span>⚡</span>
+            <span>Fast Spin</span>
+          </button>
+          <button id="toggleSoundBtn" class="btn-tool" title="Mute or unmute sound">
+            <span id="soundIcon">🔊</span>
+            <span id="soundLabel">Sound</span>
+          </button>
+          <button id="openBackupBtn" class="btn-tool" title="Import or Export progress">
+            <span>💾</span>
+            <span>Backup</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Subject Tabs -->
+      <div class="tabs-bar" id="subjectTabsBar">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container" style="flex:1; padding-top:1rem; padding-bottom:2rem;">
+    <!-- Subject Banner -->
+    <div class="subject-banner" id="subjectBanner">
+      <div>
+        <span class="badge-pill" style="background:rgba(255,255,255,0.25); color:#FFF; border:none; margin-bottom:0.4rem;">
+          Subject Reviewer
+        </span>
+        <h2 id="bannerSubjectName" class="font-cute" style="font-size:1.8rem; margin-bottom:0.25rem;">FAR</h2>
+        <p id="bannerSubjectDesc" style="font-size:0.85rem; opacity:0.95;"></p>
+      </div>
+
+      <div class="quote-box" id="quoteBox" title="Click for another inspirational CPA quote!">
+        <div style="font-size:0.72rem; font-weight:800; text-transform:uppercase; opacity:0.85; margin-bottom:0.2rem;">
+          ❤️ Reviewer Encouragement
+        </div>
+        <div id="quoteText" style="line-height:1.4; font-style:italic;"></div>
+      </div>
+    </div>
+
+    <!-- Overall Progress -->
+    <div class="overall-progress-card">
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <span style="font-size:1.5rem;">🎯</span>
+        <div>
+          <div style="font-size:0.82rem; font-weight:800; color:#334155;">Board Exam Topics Mastered</div>
+          <div id="overallStatsText" style="font-size:0.75rem; color:#64748B;">0 of 0 topics mastered</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <div class="progress-track">
+          <div class="progress-fill" id="overallProgressFill" style="width:0%;"></div>
+        </div>
+        <span id="overallPercentText" class="font-cute" style="font-weight:800; color:#F43F5E; font-size:0.95rem;">0%</span>
+      </div>
+    </div>
+
+    <!-- Main 2-Column Grid -->
+    <div class="main-grid">
+      <!-- Left: Wheel -->
+      <div class="wheel-card">
+        <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:0.5rem; align-items:center;">
+          <span style="font-size:0.8rem; font-weight:800; text-transform:uppercase; color:#94A3B8; display:flex; align-items:center; gap:0.35rem;">
+            <span id="wheelSubjectIcon">📊</span>
+            <span id="wheelSubjectTitle">FAR Topic Wheel</span>
+          </span>
+          <span id="wheelCountBadge" class="badge-pill">0 on wheel</span>
+        </div>
+
+        <div class="wheel-canvas-container" id="wheelContainer">
+          <canvas id="wheelCanvas" width="460" height="460"></canvas>
+        </div>
+
+        <button id="spinBtn" class="spin-main-btn font-cute">
+          🎯 Spin the Wheel!
+        </button>
+
+        <p style="font-size:0.75rem; color:#94A3B8; margin-top:0.75rem;">
+          Tip: Tap the wheel or button to spin! Ticked items are removed from the wheel.
+        </p>
+      </div>
+
+      <!-- Right: Collapsible Checklist Drawer -->
+      <div class="drawer-card">
+        <div class="drawer-header" id="drawerHeader">
+          <div style="display:flex; align-items:center; gap:0.65rem;">
+            <span style="font-size:1.3rem;">📋</span>
+            <div>
+              <div style="display:flex; align-items:center; gap:0.4rem;">
+                <h3 class="font-cute" style="font-size:1.05rem; color:#1E293B;">Topic Checklist & Status</h3>
+                <span id="drawerActiveCount" class="badge-pill" style="font-size:0.65rem;">0 in wheel</span>
+              </div>
+              <div id="drawerProgressText" style="font-size:0.72rem; color:#64748B;">
+                0/0 Mastered (0%)
+              </div>
+            </div>
+          </div>
+          <span id="drawerChevron" style="font-size:1.1rem; color:#64748B;">▲</span>
+        </div>
+
+        <div class="drawer-body" id="drawerBody">
+          <!-- Search & Add -->
+          <div style="display:flex; gap:0.5rem;">
+            <input type="text" id="topicSearchInput" class="search-input" placeholder="Search topics, laws, formulas...">
+            <button id="openAddTopicBtn" class="btn-tool font-cute" style="background:#F43F5E; color:#FFF; border:none; padding:0.45rem 1rem;">
+              + Add
+            </button>
+          </div>
+
+          <!-- Filter Pills -->
+          <div class="filter-pills" id="filterPillsContainer">
+            <button class="pill-btn active" data-filter="all">All (<span id="countAll">0</span>)</button>
+            <button class="pill-btn" data-filter="in-wheel">🎡 In Wheel (<span id="countInWheel">0</span>)</button>
+            <button class="pill-btn" data-filter="mastered">✨ Mastered (<span id="countMastered">0</span>)</button>
+            <button class="pill-btn" data-filter="critical">🚨 Critical (<span id="countCritical">0</span>)</button>
+            <button class="pill-btn" data-filter="comfortable">🌿 Comfortable (<span id="countComfortable">0</span>)</button>
+          </div>
+
+          <!-- Add Topic Form (hidden by default) -->
+          <div id="addTopicFormCard" style="display:none; background:#FFF1F2; padding:1rem; border-radius:18px; border:2px dashed #FDA4AF; flex-direction:column; gap:0.65rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="font-cute" style="font-size:0.85rem; font-weight:700; color:#9F1239;">Add Custom Topic to Wheel:</span>
+              <button id="closeAddTopicBtn" style="border:none; background:transparent; cursor:pointer; color:#9F1239; font-weight:bold;">✕</button>
+            </div>
+            <input type="text" id="newTopicTitle" class="search-input" style="background:#FFF;" placeholder="Topic title (e.g. VAT on Services, PFRS 15...)">
+            <input type="text" id="newTopicCategory" class="search-input" style="background:#FFF;" placeholder="Category (optional)">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; gap:0.35rem; align-items:center; font-size:0.75rem;">
+                <span>Tag:</span>
+                <select id="newTopicTagSelect" style="padding:0.25rem 0.5rem; border-radius:8px; border:1px solid #FDA4AF; font-size:0.75rem;">
+                  <option value="none">Normal</option>
+                  <option value="critical">🚨 Critical</option>
+                  <option value="comfortable">🌿 Comfortable</option>
+                </select>
+              </div>
+              <button id="submitNewTopicBtn" class="btn-tool font-cute" style="background:#E11D48; color:#FFF; border:none; padding:0.4rem 1rem;">
+                Add to Wheel ✨
+              </button>
+            </div>
+          </div>
+
+          <!-- Topic Rows Scroll List -->
+          <div class="topic-list-scroll" id="topicListContainer">
+            <!-- Rendered by JS -->
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:0.4rem; border-top:1px solid #F1F5F9; font-size:0.72rem; color:#64748B;">
+            <span>Check items to mark Mastered (removes from wheel).</span>
+            <button id="resetSubjectMasteryBtn" style="background:none; border:none; color:#F43F5E; cursor:pointer; font-weight:bold; text-decoration:underline;">
+              Reset Subject Wheel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Pop-Out Topic Modal -->
+  <div class="modal-backdrop" id="topicModalBackdrop">
+    <div class="modal-card" id="topicModalCard">
+      <div class="modal-header" id="topicModalHeader" style="background:#F43F5E;">
+        <div style="display:flex; align-items:center; gap:0.65rem;">
+          <span style="font-size:1.6rem;" id="modalSubjectIcon">🌸</span>
+          <div>
+            <div style="font-size:0.7rem; font-weight:800; text-transform:uppercase; opacity:0.9;">
+              Landed on Topic! 🎉
+            </div>
+            <h3 class="font-cute" id="modalTopicTitle" style="font-size:1.25rem; line-height:1.2;">
+              Topic Title
+            </h3>
+          </div>
+        </div>
+        <button id="closeTopicModalBtn" style="border:none; background:none; color:#FFF; font-size:1.3rem; cursor:pointer; padding:0.25rem;">
+          ✕
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Badges -->
+        <div style="display:flex; flex-wrap:wrap; gap:0.4rem;" id="modalBadgesContainer">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Cheat Sheet Highlights -->
+        <div style="background:#FFFBEB; border:1px solid #FDE68A; padding:0.85rem; border-radius:18px;">
+          <div style="font-size:0.75rem; font-weight:800; color:#92400E; text-transform:uppercase; margin-bottom:0.35rem; display:flex; align-items:center; gap:0.3rem;">
+            <span>✨</span> Reviewer Key Highlights & Formulas:
+          </div>
+          <ul id="modalKeyPointsList" style="list-style:disc; padding-left:1.2rem; font-size:0.78rem; color:#334155; line-height:1.5;">
+            <!-- Points rendered by JS -->
+          </ul>
+        </div>
+
+        <!-- Notes Area -->
+        <div style="background:#F8FAFC; border:1px solid #E2E8F0; padding:0.85rem; border-radius:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+            <span style="font-size:0.75rem; font-weight:800; color:#475569;">My Review Notes & Mnemonics:</span>
+            <button id="saveNotesBtn" style="background:#F43F5E; color:#FFF; border:none; padding:0.2rem 0.6rem; border-radius:8px; font-size:0.7rem; font-weight:bold; cursor:pointer;">
+              Save Note
+            </button>
+          </div>
+          <textarea id="modalNotesTextarea" rows="2" class="search-input" style="background:#FFF;" placeholder="Add formula reminders, acronyms, or study cues here..."></textarea>
+        </div>
+
+        <!-- Wheel Actions (Mastered vs Labels) -->
+        <div style="display:flex; flex-direction:column; gap:0.65rem;">
+          <div style="font-size:0.72rem; font-weight:800; text-transform:uppercase; color:#64748B;">
+            Update Topic Status in Wheel:
+          </div>
+
+          <button id="modalToggleMasteredBtn" class="btn-tool font-cute" style="width:100%; justify-content:center; padding:0.75rem; font-size:0.95rem; border-radius:16px;">
+            <span id="modalMasteredCheckIcon">⬜</span>
+            <span id="modalMasteredLabel">Mark as Mastered (Remove from Wheel)</span>
+          </button>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.4rem;">
+            <button class="btn-tool" id="btnLabelCritical" style="flex-direction:column; padding:0.6rem; text-align:center;">
+              <span style="font-size:1.1rem;">🚨</span>
+              <span style="font-size:0.75rem; font-weight:800;">Critical</span>
+            </button>
+            <button class="btn-tool" id="btnLabelComfortable" style="flex-direction:column; padding:0.6rem; text-align:center;">
+              <span style="font-size:1.1rem;">🌿</span>
+              <span style="font-size:0.75rem; font-weight:800;">Comfortable</span>
+            </button>
+            <button class="btn-tool" id="btnLabelReviewing" style="flex-direction:column; padding:0.6rem; text-align:center;">
+              <span style="font-size:1.1rem;">📖</span>
+              <span style="font-size:0.75rem; font-weight:800;">Reviewing</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="modalDoneBtn" class="btn-tool font-cute" style="padding:0.5rem 1.25rem;">
+          Done
+        </button>
+        <button id="modalSpinAgainBtn" class="spin-main-btn font-cute" style="font-size:0.85rem; padding:0.55rem 1.25rem;">
+          🎡 Spin Again!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backup & Restore Modal -->
+  <div class="modal-backdrop" id="backupModalBackdrop">
+    <div class="modal-card" style="border-color:#A855F7;">
+      <div class="modal-header" style="background:linear-gradient(135deg, #EC4899, #8B5CF6);">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.4rem;">💾</span>
+          <div>
+            <h3 class="font-cute" style="font-size:1.2rem;">Backup & Restore Progress</h3>
+            <div style="font-size:0.72rem; opacity:0.85;">Transfer or reset your study progress</div>
+          </div>
+        </div>
+        <button id="closeBackupModalBtn" style="border:none; background:none; color:#FFF; font-size:1.3rem; cursor:pointer;">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <p style="font-size:0.78rem; color:#475569;">
+          Your progress is auto-saved in your browser. You can also download a JSON backup or copy it to transfer to another device.
+        </p>
+
+        <div style="display:flex; gap:0.5rem;">
+          <button id="downloadBackupBtn" class="spin-main-btn font-cute" style="flex:1; background:#8B5CF6; font-size:0.85rem; padding:0.65rem;">
+            ⬇️ Download Backup
+          </button>
+          <button id="copyBackupBtn" class="btn-tool font-cute" style="padding:0.65rem 1rem;">
+            📋 Copy JSON
+          </button>
+        </div>
+
+        <div style="margin-top:0.5rem;">
+          <div style="font-size:0.75rem; font-weight:800; color:#475569; margin-bottom:0.25rem;">
+            Restore from Backup:
+          </div>
+          <input type="file" id="uploadBackupInput" accept=".json,application/json" style="font-size:0.75rem; width:100%; margin-bottom:0.4rem;">
+          <textarea id="pasteBackupTextarea" rows="3" class="search-input font-mono" style="font-size:0.7rem; background:#FFF;" placeholder="Or paste JSON backup content here..."></textarea>
+          <button id="applyRestoreBtn" class="btn-tool font-cute" style="width:100%; justify-content:center; background:#1E293B; color:#FFF; margin-top:0.4rem; padding:0.55rem;">
+            Restore Progress Now ✨
+          </button>
+        </div>
+
+        <div style="border-top:1px solid #E2E8F0; padding-top:0.75rem; text-align:center;">
+          <button id="fullResetBtn" style="background:none; border:none; color:#E11D48; font-size:0.75rem; font-weight:800; cursor:pointer;">
+            ⚠️ Reset All 6 Subjects to Initial Reviewer Defaults
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data & Logic Script -->
+  <script>
+    // Embedded Data
+    const SUBJECT_CONFIGS = [
+  {
+    "id": "FAR",
+    "name": "FAR",
+    "fullName": "Financial Accounting & Reporting",
+    "description": "Assets, liabilities, equity, leases, revenue, MSMEs & financial statements",
+    "icon": "📊",
+    "accentColor": "#EC4899",
+    "lightColor": "#FDF2F8",
+    "borderColor": "#FBCFE8",
+    "badgeBg": "bg-pink-100",
+    "badgeText": "text-pink-700"
+  },
+  {
+    "id": "AFAR",
+    "name": "AFAR",
+    "fullName": "Advanced Financial Accounting & Reporting",
+    "description": "Partnership, business combinations, consolidation, costing & NPO/Govt",
+    "icon": "✨",
+    "accentColor": "#8B5CF6",
+    "lightColor": "#F5F3FF",
+    "borderColor": "#DDD6FE",
+    "badgeBg": "bg-purple-100",
+    "badgeText": "text-purple-700"
+  },
+  {
+    "id": "RFBT",
+    "name": "RFBT",
+    "fullName": "Regulatory Framework for Business Transactions",
+    "description": "Corporations, obligations & contracts, sales, banking laws, IP & labor",
+    "icon": "⚖️",
+    "accentColor": "#3B82F6",
+    "lightColor": "#EFF6FF",
+    "borderColor": "#BFDBFE",
+    "badgeBg": "bg-blue-100",
+    "badgeText": "text-blue-700"
+  },
+  {
+    "id": "TAX",
+    "name": "TAX",
+    "fullName": "Taxation",
+    "description": "Income tax, VAT, estate & donor taxes, remedies, EOPT & CMEPA",
+    "icon": "📑",
+    "accentColor": "#10B981",
+    "lightColor": "#ECFDF5",
+    "borderColor": "#A7F3D0",
+    "badgeBg": "bg-emerald-100",
+    "badgeText": "text-emerald-700"
+  },
+  {
+    "id": "MAS",
+    "name": "MAS",
+    "fullName": "Management Advisory Services",
+    "description": "CVP analysis, standard costing, capital budgeting, economics & WACC",
+    "icon": "📈",
+    "accentColor": "#F59E0B",
+    "lightColor": "#FFFBEB",
+    "borderColor": "#FDE68A",
+    "badgeBg": "bg-amber-100",
+    "badgeText": "text-amber-700"
+  },
+  {
+    "id": "AUD",
+    "name": "AUD",
+    "fullName": "Auditing (Theory & Practice)",
+    "description": "Audit risk model, internal control, audit evidence, sampling & reports",
+    "icon": "🔍",
+    "accentColor": "#14B8A6",
+    "lightColor": "#F0FDFA",
+    "borderColor": "#99F6E4",
+    "badgeBg": "bg-teal-100",
+    "badgeText": "text-teal-700"
+  }
+];
+    const INITIAL_TOPICS = {
+  "FAR": [
+    {
+      "id": "far-1",
+      "title": "Cash & Cash Equivalents",
+      "category": "Assets",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "PCF Shortage/Overage = PCF count vs Imprest balance",
+        "Cash equivalents: Acquired within 3 months to maturity",
+        "Compensating balance: Unrestricted = Cash, Restricted = Short/Long Term",
+        "Equity securities excluded except redeemable preference shares"
+      ]
+    },
+    {
+      "id": "far-2",
+      "title": "Proof of Cash & Bank Reconciliation",
+      "category": "Assets",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "DIT and OC carry forward adjustments",
+        "Book errors vs Bank errors impact on receipts/disbursements",
+        "Unadjusted balance + DIT - OC = Adjusted bank balance"
+      ]
+    },
+    {
+      "id": "far-3",
+      "title": "Accounts Receivable & Doubtful Accounts (AWERA)",
+      "category": "Receivables",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "AWERA Method: Allowance Beg (A), Write-off (W), Expense (E), Recovery (R), Allowance End (A)",
+        "Net Realizable Value = Gross AR - Allowances (discounts, returns, doubtful accounts)"
+      ]
+    },
+    {
+      "id": "far-4",
+      "title": "Notes Receivable & Financing",
+      "category": "Receivables",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Receivable Financing: Pledging (general), Assignment (specific receivables with notification)",
+        "Factoring: Casual sale vs Continuing arrangement (factor's holdback)",
+        "Discounting: Maturity value = P x (1 + R x T); Proceeds = Mat Val - Discount"
+      ]
+    },
+    {
+      "id": "far-5",
+      "title": "Loans Receivable & ECL 3-Stage Model",
+      "category": "Receivables",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Initial: PV of cash flows + Direct origination cost - Origination fees",
+        "Stage 1: 12-month ECL, EIR on gross carrying amount",
+        "Stage 2: Lifetime ECL, EIR on gross carrying amount",
+        "Stage 3: Lifetime ECL, EIR on net amortized cost (credit-impaired)"
+      ]
+    },
+    {
+      "id": "far-6",
+      "title": "Inventories & Lower of Cost and NRV (LCNRV)",
+      "category": "Inventories",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "NRV = Estimated Selling Price - Cost of Disposal - Cost to Complete",
+        "Applied item by item; loss is charged to COGS",
+        "FOB Shipping Point (buyer owns in transit) vs FOB Destination (seller owns)",
+        "Consignor includes out on consignment; consignee excludes held on consignment"
+      ]
+    },
+    {
+      "id": "far-7",
+      "title": "Gross Profit & Retail Inventory Methods",
+      "category": "Inventories",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Gross Profit Method: Sales - Est COGS = Est Ending Inventory (detects shortage/overage)",
+        "Retail Method: Conservative (+Markup, no Markdown in cost ratio)",
+        "Average method includes markdown in ratio; FIFO excludes beginning inventory"
+      ]
+    },
+    {
+      "id": "far-8",
+      "title": "Property, Plant & Equipment (PPE)",
+      "category": "Non-Current Assets",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Initial: Purchase price + DACs + Dismantling cost at PV",
+        "Exchange with commercial substance: Gain/Loss = FV given up - CA given up",
+        "Demolition for land use capitalized to land; for new building depends on timing"
+      ]
+    },
+    {
+      "id": "far-9",
+      "title": "Depreciation & Revaluation Model",
+      "category": "Non-Current Assets",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "SYD = n(n+1)/2; Declining balance ignores salvage value until final year",
+        "Revaluation Surplus: recorded in OCI, amortized directly to Retained Earnings",
+        "Leasehold Improvements depreciated over shorter of useful life or remaining lease term"
+      ]
+    },
+    {
+      "id": "far-10",
+      "title": "Borrowing Costs Capitalization",
+      "category": "Liabilities/Assets",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Specific borrowing: Actual interest expense - temporary investment income",
+        "General borrowing: Weighted Average Expenditures (WAE) x Capitalization rate",
+        "Capitalizable cost is lower of actual borrowing costs vs computed average borrowing cost"
+      ]
+    },
+    {
+      "id": "far-11",
+      "title": "Agriculture & Biological Assets (PAS 41)",
+      "category": "Special Assets",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Consumable plants/animals = Biological assets at FVLCD",
+        "Bearer plants = PPE under PAS 16; produce at harvest = biological asset"
+      ]
+    },
+    {
+      "id": "far-12",
+      "title": "Intangibles, Patents & R&D Costs",
+      "category": "Intangibles",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Research Phase: Expensed outright; Development Phase: Capitalized if criteria met",
+        "Patent: Legal life 20 years; Trademark: 10 years renewable; Copyright: Life + 50 yrs",
+        "Internally generated goodwill is NEVER recognized"
+      ]
+    },
+    {
+      "id": "far-13",
+      "title": "Cash Generating Units (CGU) & Impairment",
+      "category": "Impairment",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Recoverable amount = Higher of Value in Use vs FVLCD",
+        "Impairment allocated first 100% to Goodwill, then pro-rata to other non-cash assets"
+      ]
+    },
+    {
+      "id": "far-14",
+      "title": "Segment Reporting (PFRS 8)",
+      "category": "Disclosures",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "10% tests: Revenue test, Asset test, Profit/Loss test (higher absolute)",
+        "75% Overall size test: External revenue must equal at least 75% of total"
+      ]
+    },
+    {
+      "id": "far-15",
+      "title": "Events After Reporting Period & Discontinued Operations",
+      "category": "Reporting",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Adjusting events: existed at reporting date (bankruptcy, court settlement)",
+        "Non-adjusting events: arose after reporting date (fire, business combo, FX shifts) - Disclose",
+        "Discontinued operations presented net of tax below continuing operations"
+      ]
+    },
+    {
+      "id": "far-16",
+      "title": "Investments in Equity Securities & Associates",
+      "category": "Investments",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "FVPL (trading) vs FVOCI (irrevocable non-trading, OCI to RE, no recycling)",
+        "Associate (20-50%): Equity method, FVINA amortization adjustments",
+        "Stock dividends: memo entry only unless different class"
+      ]
+    },
+    {
+      "id": "far-17",
+      "title": "Investment Property (PAS 40)",
+      "category": "Investments",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Held for capital appreciation or rental; Cost model (depreciated) vs Fair Value model (no depreciation, changes in P/L)",
+        "Reclassification to owner-occupied PPE uses FV at date of change"
+      ]
+    },
+    {
+      "id": "far-18",
+      "title": "Investments in Debt Securities (PFRS 9)",
+      "category": "Investments",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Hold to collect = Amortized cost; Hold to collect & sell = FVOCI; Other = FVPL",
+        "Reclassifications occur 1st day of reporting period following business model change"
+      ]
+    },
+    {
+      "id": "far-19",
+      "title": "Wasting Assets & Government Grants",
+      "category": "Special Assets",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Depletion base = Cost + Exploration + Development + Restoration - Residual",
+        "Maximum dividend = Unrestricted RE + Realized accumulated depletion",
+        "Government grants recognized in P/L matching related expenses"
+      ]
+    },
+    {
+      "id": "far-20",
+      "title": "Financial Liabilities & Bonds Payable",
+      "category": "Liabilities",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Substantial modification of debt: 10% test (gain/loss recognized, extinguish old)",
+        "Compound instruments: Liability component at FV, Equity component is residual"
+      ]
+    },
+    {
+      "id": "far-21",
+      "title": "Income Tax Accounting (PAS 12)",
+      "category": "Taxation",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Permanent differences (fines, FWT income) affect only current tax",
+        "Future Taxable Amounts (FTA) create Deferred Tax Liability (DTL)",
+        "Future Deductible Amounts (FDA) create Deferred Tax Asset (DTA)"
+      ]
+    },
+    {
+      "id": "far-22",
+      "title": "Leases - Lessor & Lessee Accounting (PFRS 16)",
+      "category": "Leases",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Lessee: Recognize Right-of-Use Asset (ROUA) & Lease Liability (PV of rentals)",
+        "Exemptions: Short-term (<12 mos) and low-value assets",
+        "Sale and leaseback: Proportional gain recognition on rights transferred"
+      ]
+    },
+    {
+      "id": "far-23",
+      "title": "Employee Benefits (PAS 19)",
+      "category": "Liabilities",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Defined Contribution: Contributed amount expensed",
+        "Defined Benefit: Service Cost + Net Interest in P/L; Remeasurements in OCI",
+        "Asset ceiling effect (EAC): Interest in P/L, change in ceiling in OCI"
+      ]
+    },
+    {
+      "id": "far-24",
+      "title": "Shareholders' Equity & Treasury Shares",
+      "category": "Equity",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Small share dividends (<20%): Debited at FV; Large share dividends (>=20%): Par value",
+        "Treasury shares recorded at cost; Reissuance gain to Share Premium - TS"
+      ]
+    },
+    {
+      "id": "far-25",
+      "title": "Book Value Per Share & Earnings Per Share (EPS)",
+      "category": "Equity",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "BEPS = (Net Income - Preference Dividends) / WACSO",
+        "Diluted EPS considers convertible bonds, options (treasury stock method)",
+        "BVPS allocates equity after deducting liquidation value and preference dividend arrears"
+      ]
+    },
+    {
+      "id": "far-26",
+      "title": "Share-Based Payments (PFRS 2)",
+      "category": "Equity",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Equity-settled: FV of options at grant date, allocated over vesting period",
+        "Cash-settled (SARs): Measured at FV at each reporting date until settled"
+      ]
+    },
+    {
+      "id": "far-27",
+      "title": "Accounting for MSMEs (Micro, Small, Medium)",
+      "category": "Frameworks",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Micro: Assets/Liab < P3M; Small: P3M to P100M; Medium: P100M to P350M",
+        "SMEs allowed single Statement of Income & Retained Earnings under specific cases",
+        "SMEs expense all borrowing costs and R&D"
+      ]
+    }
+  ],
+  "AFAR": [
+    {
+      "id": "afar-1",
+      "title": "Partnership Formation & Operations",
+      "category": "Partnership",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Basis of non-cash assets: Agreed value > Fair Market Value > Book Value",
+        "Profits/Losses priority: Agreement > Capital ratio (losses follow profit agreement)",
+        "Temporary withdrawals do not affect average capital calculation"
+      ]
+    },
+    {
+      "id": "afar-2",
+      "title": "Partnership Dissolution & Admission",
+      "category": "Partnership",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Admission by purchase: personal transaction between partners",
+        "Admission by investment: AC = CC (no bonus); AC > CC (bonus to new); AC < CC (bonus to old)"
+      ]
+    },
+    {
+      "id": "afar-3",
+      "title": "Partnership Liquidation - Safe Payments & CPP",
+      "category": "Partnership",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Safe Payments Schedule: Cash withheld for future liquidation expenses and unpaid liabilities",
+        "Cash Priority Program (CPP): Based on Maximum Loss Absorption Capacity (MLAC)",
+        "Most vulnerable partner has the LOWEST maximum absorption capacity"
+      ]
+    },
+    {
+      "id": "afar-4",
+      "title": "Corporate Liquidation - Statement of Affairs & SoRaL",
+      "category": "Liquidation",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Statement of Affairs: Assets at realizable values, liabilities at settlement price",
+        "Expected Recovery % = Net Free Assets / Total Unsecured Liabilities without Priority",
+        "SoRaL: Reports actual liquidation results (Assets realized vs to be realized)"
+      ]
+    },
+    {
+      "id": "afar-5",
+      "title": "PFRS 15 Long-Term Construction Contracts",
+      "category": "Revenue",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Reliable estimates: Percentage of Completion (Cost-to-Cost method)",
+        "Unreliable estimates: Zero-profit / Cost recovery method",
+        "CIP > Progress Billings = Current Asset; CIP < Billings = Current Liability"
+      ]
+    },
+    {
+      "id": "afar-6",
+      "title": "Franchise Accounting & 5 Steps (COPAS)",
+      "category": "Revenue",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Initial Franchise Fees (IFF): Point-in-time vs Over-time (maintain brand value)",
+        "Continuing Franchise Fees (CFF): Recognized as earned based on sales",
+        "COPAS: Contracts with customer, Obligations, Price, Allocation, Satisfy obligation"
+      ]
+    },
+    {
+      "id": "afar-7",
+      "title": "Licenses & Consignment Accounting",
+      "category": "Revenue",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Licenses: Right to Access (Over Time) vs Right to Use (Point in Time)",
+        "Consignment: Consignor = Principal/Owner; Consignee = Agent",
+        "Remittance = Collections - Consignee charges (commission, delivery, cartage)"
+      ]
+    },
+    {
+      "id": "afar-8",
+      "title": "Business Combinations - Acquisition Method",
+      "category": "Business Combinations",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Direct acquisition costs (DACs) expensed; Share issuance costs charged to APIC",
+        "Goodwill = Consideration Transferred + NCI - Fair Value of Identifiable Net Assets (FVINA)",
+        "Full Goodwill method vs Partial/Proportional Goodwill method"
+      ]
+    },
+    {
+      "id": "afar-9",
+      "title": "Business Combinations - Step Acquisition & Reverse",
+      "category": "Business Combinations",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Previously held equity interest remeasured at fair value on acquisition date (P/L or OCI)",
+        "Reverse acquisition: Private entity is accounting acquirer, public entity is legal parent"
+      ]
+    },
+    {
+      "id": "afar-10",
+      "title": "Consolidated Balance Sheet at & after Acquisition",
+      "category": "Consolidation",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Eliminate parent's investment vs subsidiary's equity accounts",
+        "Undervaluation added to assets; subsequent amortization reduces consolidated net income"
+      ]
+    },
+    {
+      "id": "afar-11",
+      "title": "Intercompany Sales of Inventories (UPEI & RPBI)",
+      "category": "Consolidation",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Downstream: Parent sells to Sub (100% parent impact)",
+        "Upstream: Sub sells to Parent (shared between parent & NCI)",
+        "Unrealized Profit in Ending Inventory (UPEI) deducted; Realized Profit (RPBI) added"
+      ]
+    },
+    {
+      "id": "afar-12",
+      "title": "Intercompany Fixed Assets & Depreciables",
+      "category": "Consolidation",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Unrealized gain on equipment eliminated in year of sale",
+        "Realized through piecemeal depreciation over remaining useful life"
+      ]
+    },
+    {
+      "id": "afar-13",
+      "title": "Foreign Currency Transactions & Translations (PAS 21)",
+      "category": "Foreign Currency",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Monetary items adjusted at closing rate; Non-monetary at historical rate",
+        "Translation (Functional to Presentation): Assets/Liab at closing rate; Equity at historical; OCI",
+        "Remeasurement (Temporal method): Exchange differences go directly to P/L"
+      ]
+    },
+    {
+      "id": "afar-14",
+      "title": "Derivatives & Hedging Accounting",
+      "category": "Foreign Currency",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Fair Value Hedge: G/L on hedged item & hedging instrument both go to P/L",
+        "Cash Flow Hedge: Effective portion to OCI, Ineffective portion to P/L"
+      ]
+    },
+    {
+      "id": "afar-15",
+      "title": "Home Office & Branch Accounting",
+      "category": "Branch Accounting",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Shipments billed above cost: Allowance for Overvaluation of Branch Inventory",
+        "Reciprocal accounts: Investment in Branch (Debit) vs Home Office Current (Credit)",
+        "Adjusted balances of reciprocal accounts must ALWAYS be equal"
+      ]
+    },
+    {
+      "id": "afar-16",
+      "title": "Job Order Costing (Spoilage, Rework & Scrap)",
+      "category": "Cost Accounting",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Normal scrap/spoilage charged to specific job (WIP) or all jobs (FOH Control)",
+        "Underapplied FOH = Unfavorable; Overapplied = Favorable; allocated pro-rata if significant"
+      ]
+    },
+    {
+      "id": "afar-17",
+      "title": "Process Costing & Lost Units (FIFO vs WA)",
+      "category": "Cost Accounting",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "FIFO EUP considers work done this period only; Weighted Average blends beginning + current",
+        "Normal loss at end of process absorbed only by units that passed inspection point"
+      ]
+    },
+    {
+      "id": "afar-18",
+      "title": "Joint Products, By-Products & Cost Allocations",
+      "category": "Cost Accounting",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Allocation methods: Physical output, Sales value at split-off, NRV method",
+        "By-product: Reversal method or production method (reduces joint costs)"
+      ]
+    },
+    {
+      "id": "afar-19",
+      "title": "Activity-Based Costing (ABC) & Service Department Allocations",
+      "category": "Cost Accounting",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "ABC allocates costs via cost drivers (activities)",
+        "Service department allocations: Direct method (ignores mutual services) vs Step-Down vs Reciprocal"
+      ]
+    },
+    {
+      "id": "afar-20",
+      "title": "Non-Profit Organizations (NPO Accounting)",
+      "category": "Government/NPO",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Net assets: Unrestricted, Temporarily Restricted (time/purpose), Permanently Restricted",
+        "Expenses always decrease Unrestricted Net Assets only"
+      ]
+    },
+    {
+      "id": "afar-21",
+      "title": "Government Accounting Manual (GAM & Budget)",
+      "category": "Government/NPO",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "COA (rules), DBM (budget execution/allotment), BTr (treasury cash registry/NCA)",
+        "Budget process: Preparation -> Legislation -> Execution -> Accountability",
+        "Modified Disbursement System (MDS) checks; Reversion of unused NCA"
+      ]
+    },
+    {
+      "id": "afar-22",
+      "title": "Installment Sales & Repossessions",
+      "category": "Revenue",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Deferred Gross Profit = Installment AR x Gross Profit Rate",
+        "Realized Gross Profit = Collections x Gross Profit Rate",
+        "Repossessed inventory recorded at fair market value at repossession date"
+      ]
+    }
+  ],
+  "RFBT": [
+    {
+      "id": "rfbt-1",
+      "title": "Consumer Protection Act (RA 7394)",
+      "category": "Special Laws",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Deceptive sales acts (fraud/misrepresentation) vs Unfair sales acts (taking advantage)",
+        "Home solicitation sales allowed only 9:00 AM - 7:00 PM on working days with DTI permit",
+        "Pyramid sales schemes prohibited; Minimum labeling and price tag rules"
+      ]
+    },
+    {
+      "id": "rfbt-2",
+      "title": "Lemon Law (RA 10462)",
+      "category": "Special Laws",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Applies to brand new motor vehicles purchased in PH within 12 months or 20,000 km",
+        "Requires at least 4 separate repair attempts for the same complaint, then final attempt"
+      ]
+    },
+    {
+      "id": "rfbt-3",
+      "title": "Data Privacy Act (RA 10173)",
+      "category": "Special Laws",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Principles: Transparency, Legitimate Purpose, Proportionality",
+        "Sensitive personal info: race, marital status, health, SSS no., executive orders",
+        "Breach notification to NPC within 72 hours; At least 100 data subjects = no delay"
+      ]
+    },
+    {
+      "id": "rfbt-4",
+      "title": "Electronic Commerce Act (RA 8792)",
+      "category": "Special Laws",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Electronic Data Message (EDM) and electronic documents have legal effect and admissibility",
+        "Time & place of dispatch/receipt principles"
+      ]
+    },
+    {
+      "id": "rfbt-5",
+      "title": "Ease of Doing Business Act (RA 11032)",
+      "category": "Special Laws",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Anti-Red Tape Authority (ARTA); Citizen's Charter required",
+        "Processing times: Simple (3 days), Complex (7 days), Highly technical (20 working days)",
+        "Automatic approval if complete documents and failure to act within timeframe"
+      ]
+    },
+    {
+      "id": "rfbt-6",
+      "title": "Philippine Competition Act (RA 10667)",
+      "category": "Special Laws",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Anti-competitive agreements prohibited per se: price fixing, bid rigging, market sharing",
+        "Abuse of dominant position (at least 50% market share)",
+        "Compulsory merger notification threshold (> P1 Billion); 30-day review period"
+      ]
+    },
+    {
+      "id": "rfbt-7",
+      "title": "Government Procurement Reform Act (RA 9184)",
+      "category": "Special Laws",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Approved Budget for Contract (ABC); Lowest Calculated Responsive Bid (LCRB)",
+        "Alternative methods: Direct Contracting, Repeat Order, Shopping, Negotiated Procurement"
+      ]
+    },
+    {
+      "id": "rfbt-8",
+      "title": "Labor Law (RA 6715 & PD 442)",
+      "category": "Labor",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Normal work hours: 8 hours max; Meal period at least 1 hour (unpaid)",
+        "Overtime premium: 25% regular, 30% holiday; Night differential 10% (10PM - 6AM)",
+        "13th month pay: 1/12 basic salary, paid not later than Dec 24; SIL 5 days"
+      ]
+    },
+    {
+      "id": "rfbt-9",
+      "title": "Social Security Law (RA 11199)",
+      "category": "Labor",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Compulsory coverage: all employees <=60 yrs, employers, self-employed, OFWs",
+        "Retirement pension: at least 120 monthly contributions (60 y/o separated, 65 y/o employed)",
+        "Maternity leave 105 days (+15 days solo parents)"
+      ]
+    },
+    {
+      "id": "rfbt-10",
+      "title": "FRIA - Financial Rehabilitation (RA 10142)",
+      "category": "Insolvency",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Suspension of payments: technically insolvent individuals with sufficient assets but illiquid",
+        "Court rehabilitation: Stay Order within 5 days suspends all claims against debtor",
+        "Cram-down effect: approved rehabilitation plan is binding on all creditors"
+      ]
+    },
+    {
+      "id": "rfbt-11",
+      "title": "FRIA - Liquidation & Acts of Insolvency",
+      "category": "Insolvency",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Voluntary vs Involuntary liquidation; Minimum claim of at least P500,000",
+        "Acts of insolvency: absconding, hiding assets, fraudulent conveyance, defaulting 30 days"
+      ]
+    },
+    {
+      "id": "rfbt-12",
+      "title": "Intellectual Property Code (RA 8293)",
+      "category": "IP Law",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Patent: Novelty, inventive step, industrial applicability; 20-year term from filing",
+        "Trademark: Distinctive visible sign; 10 years renewable; Declaration of Actual Use (DAU)",
+        "Copyright: Created upon creation; Lifetime + 50 years; Fair use doctrine"
+      ]
+    },
+    {
+      "id": "rfbt-13",
+      "title": "Law on Insurance (RA 10607)",
+      "category": "Insurance",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Insurable interest: Life (at inception); Property (at inception and at time of loss)",
+        "Contract of adhesion; Aleatory; Right of subrogation automatically enures to insurer"
+      ]
+    },
+    {
+      "id": "rfbt-14",
+      "title": "Anti-Money Laundering Act (AMLA RA 9160)",
+      "category": "Banking",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "3 Stages: Placement (highest risk), Layering (untraceable), Integration (clean)",
+        "Covered transactions: > P500,000 for banks; Suspicious transactions: report next working day",
+        "AMLC composition: BSP Governor (Chairman), IC Commissioner, SEC Chairperson"
+      ]
+    },
+    {
+      "id": "rfbt-15",
+      "title": "Bank Secrecy Law (RA 1405)",
+      "category": "Banking",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Absolute confidentiality of deposits; Exceptions (WIObmu CARO TEA)",
+        "Written consent, Impeachment, Order of court, AMLA, BIR estate inquiry, PCGG, Ombudsman"
+      ]
+    },
+    {
+      "id": "rfbt-16",
+      "title": "Truth in Lending & PDIC Act",
+      "category": "Banking",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Truth in Lending (RA 3765): clear disclosure of finance charges, EIR/SIR",
+        "PDIC (RA 3591): Maximum deposit insurance coverage up to P1,000,000 per depositor per bank"
+      ]
+    },
+    {
+      "id": "rfbt-17",
+      "title": "Bouncing Checks Law (BP 22) vs Estafa",
+      "category": "Commercial Law",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "BP 22: Mala prohibita; 90 days maintaining balance; 5 banking days notice of dishonor",
+        "Estafa: Mala in se; requires deceit and damage"
+      ]
+    },
+    {
+      "id": "rfbt-18",
+      "title": "Revised Corporation Code (RA 11232)",
+      "category": "Corporations",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Perpetual existence; Natural and juridical incorporators allowed; Repealed 25%-25% rule",
+        "One Person Corporation (OPC); Powers: Express, Implied, Inherent"
+      ]
+    },
+    {
+      "id": "rfbt-19",
+      "title": "Board of Directors, Officers & Voting",
+      "category": "Corporations",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Vacancies: REI (Removal, Expiration, Increase in seats) filled by Stockholders only",
+        "Other vacancies filled by remaining BOD if quorum exists (ReDAD: Resign, Death, Abandon)",
+        "2/3 Stockholders vote required for amendment of AoI, merger, sale of all assets"
+      ]
+    },
+    {
+      "id": "rfbt-20",
+      "title": "Shares of Stock, Delinquency & Appraisal Rights",
+      "category": "Corporations",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Pre-emptive right allows maintaining equity %; Appraisal right to withdraw upon dissent",
+        "Delinquent shares: lost right to vote; sold at public auction to highest bidder"
+      ]
+    },
+    {
+      "id": "rfbt-21",
+      "title": "Philippine Cooperative Code (RA 9520)",
+      "category": "Cooperatives",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Minimum 15 natural persons; 1 member 1 vote; Net surplus distribution (Reserve fund >=50%)"
+      ]
+    },
+    {
+      "id": "rfbt-22",
+      "title": "Law on Partnerships (Civil Code)",
+      "category": "Partnerships",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Universal vs Particular; Industrial partner cannot engage in other business without consent",
+        "Dissolution: Extrajudicial vs Judicial causes; Limited partner cannot be industrial partner"
+      ]
+    },
+    {
+      "id": "rfbt-23",
+      "title": "Obligations & Extinguishment (Civil Code)",
+      "category": "Obligations",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Sources: Law, Contracts, Quasi-contracts (Negotiorum Gestio, Solutio Indebiti), Delicts, Quasi-delicts",
+        "Extinguishment: Payment, Loss, Condonation, Confusion, Compensation, Novation"
+      ]
+    },
+    {
+      "id": "rfbt-24",
+      "title": "Contracts & Defective Contracts",
+      "category": "Contracts",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Essential elements: Consent, Object, Cause (Cognition Theory)",
+        "Hierarchy: Rescissible (lesion) -> Voidable (consent vitiated) -> Unenforceable (SoF) -> Void (inexistent)"
+      ]
+    },
+    {
+      "id": "rfbt-25",
+      "title": "Law on Sales (Recto & Maceda Laws)",
+      "category": "Sales",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Recto Law: Personal property in installment (Exact fulfillment, cancel, foreclose chattel mortgage)",
+        "Maceda Law: Residential property installments (Cash surrender value >=50% after 2 yrs)"
+      ]
+    },
+    {
+      "id": "rfbt-26",
+      "title": "Credit Transactions (Pledge vs Mortgages)",
+      "category": "Credit",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Pledge: Personal property, delivery required, extrajudicial sale, no deficiency recovery",
+        "Real Estate Mortgage: Real property, registered in RD, deficiency recoverable",
+        "Chattel Mortgage: Personal property, Affidavit of Good Faith registered in RD"
+      ]
+    }
+  ],
+  "TAX": [
+    {
+      "id": "tax-1",
+      "title": "Senior Citizens & PWD Benefits",
+      "category": "Preferential Tax",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "20% Discount + VAT Exemption on medicines, professional fees, restaurants, hotels",
+        "5% utility discount on water (<30 cu.m) and electricity (<100 kWh)",
+        "Establishment gets 15% (SC) or 25% (PWD) deduction for salaries paid"
+      ]
+    },
+    {
+      "id": "tax-2",
+      "title": "BOI Registered Enterprises & CREATE Act",
+      "category": "Incentives",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Special Corporate Income Tax (SCIT): 5% in lieu of all taxes (3% National, 2% LGU)",
+        "Income Tax Holiday (ITH) 4-7 years based on SIPP Tiers, followed by SCIT or Enhanced Deductions",
+        "BMBE Law: Assets <= P3M exempt from income tax"
+      ]
+    },
+    {
+      "id": "tax-3",
+      "title": "Remedies of the Taxpayer (Protest & Appeal)",
+      "category": "Remedies",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Notice of Discrepancy (30 days) -> PAN (15 days to reply) -> FAN/FLD (30 days to protest)",
+        "Protest: Reconsideration or Reinvestigation (60 days to submit documents)",
+        "CIR has 180 days to decide; Appeal to CTA within 30 days from denial"
+      ]
+    },
+    {
+      "id": "tax-4",
+      "title": "Remedies of the Government (Assessment & Collection)",
+      "category": "Remedies",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Ordinary assessment period: 3 years from last day or actual filing (whichever is later)",
+        "False/fraudulent return: 10 years from discovery; Collection within 5 years after FAN"
+      ]
+    },
+    {
+      "id": "tax-5",
+      "title": "Civil Penalties & Compromise of Taxes",
+      "category": "Penalties",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Surcharge: 25% for simple delay/wrong venue; 50% for willful neglect or fraudulent return",
+        "Compromise: Financial Incapacity (min 10% basic tax), Doubtful Validity (min 40% basic tax)"
+      ]
+    },
+    {
+      "id": "tax-6",
+      "title": "Excise Tax (Automobiles, Sweetened Drinks & Fuel)",
+      "category": "Excise Tax",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Exempt automobiles: pure electric vehicles, jeepneys, buses, trucks",
+        "Sweetened beverages subject to excise; exempt: 100% natural fruit juice, milk products, coffee",
+        "Alcohol, tobacco, minerals, cosmetic invasive surgery (5%)"
+      ]
+    },
+    {
+      "id": "tax-7",
+      "title": "Documentary Stamp Tax (DST)",
+      "category": "DST",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Original issuance of shares: P2 per P200 par value",
+        "Sales of shares: P1.5 per P200; Bank checks: P3 per check; Real property sale: P15 per P1,000"
+      ]
+    },
+    {
+      "id": "tax-8",
+      "title": "Value-Added Tax (VAT) Mechanics & Registration",
+      "category": "VAT",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Threshold: Gross sales exceed P3,000,000 in a 12-month period; Rate: 12%",
+        "Transactions deemed sale: consignments unsold >60 days, retirement inventories, distributions"
+      ]
+    },
+    {
+      "id": "tax-9",
+      "title": "Zero-Rated Sales & Cross-Border Doctrine",
+      "category": "VAT",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Direct export of goods/services: 0% VAT; Cross-border doctrine: taxed where consumed",
+        "Effectively zero-rated: sales to PEZA/Freeport zones"
+      ]
+    },
+    {
+      "id": "tax-10",
+      "title": "VAT Exemptions & Presumptive Input VAT",
+      "category": "VAT",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Exempt: Agricultural & marine food in original state (CCROP MO); Residential rent <= P15,000/mo",
+        "Presumptive Input VAT: 4% on primary agricultural inputs for sardines, mackerel, milk, sugar, cooking oil"
+      ]
+    },
+    {
+      "id": "tax-11",
+      "title": "Estate Tax - Gross Estate & Inclusions",
+      "category": "Transfer Taxes",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Rate: 6% flat rate on Net Taxable Estate; Inclusions: Revocable transfers, transfers in contemplation of death",
+        "Valuation: Real property higher of Zonal vs Assessed value; Unlisted common shares at book value"
+      ]
+    },
+    {
+      "id": "tax-12",
+      "title": "Estate Tax - Deductions & Filing",
+      "category": "Transfer Taxes",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Standard deduction: P5,000,000 (Resident/Citizen); Family home: Max P10,000,000",
+        "Vanishing deduction (Property previously taxed within 5 years)",
+        "Filing: BIR Form 1801 within 1 year from death"
+      ]
+    },
+    {
+      "id": "tax-13",
+      "title": "Donor's Tax & Valuation",
+      "category": "Transfer Taxes",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "6% tax on gifts in excess of P250,000 exempt threshold per calendar year",
+        "Form: BIR Form 1800 filed within 30 days from date of donation"
+      ]
+    },
+    {
+      "id": "tax-14",
+      "title": "Dealings in Properties & Capital Gains Tax (CGT)",
+      "category": "Income Tax",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Unlisted shares: 15% CGT; Real property capital asset: 6% of higher GSP vs FMV",
+        "Principal residence exemption: 18 months reinvestment, once every 10 years",
+        "Holding period for individuals: <= 12 mos = 100%, > 12 mos = 50%"
+      ]
+    },
+    {
+      "id": "tax-15",
+      "title": "Individual Income Taxation (Graduated vs 8%)",
+      "category": "Income Tax",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Resident citizens taxed on worldwide income; Non-residents taxed on PH income only",
+        "8% optional flat tax on gross sales in excess of P250,000 for pure self-employed"
+      ]
+    },
+    {
+      "id": "tax-16",
+      "title": "Fringe Benefits Tax (FBT) & De Minimis",
+      "category": "Income Tax",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Imposed on managerial/supervisory employees: Grossed-up monetary value x 35%",
+        "Rank-and-file employees exempt from FBT; De minimis benefits within ceilings exempt"
+      ]
+    },
+    {
+      "id": "tax-17",
+      "title": "Corporate Income Tax & General Principles",
+      "category": "Income Tax",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "RCIT: 25% (or 20% for micro/small corporations); MCIT: 2% of gross income",
+        "Lifeblood theory; Inherent limitations (public purpose, territoriality, comity)"
+      ]
+    },
+    {
+      "id": "tax-18",
+      "title": "Real Property Tax (RPT) & Local Taxes",
+      "category": "Local Taxes",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "RPT = Assessed Value x Tax Rate (1% Province, 2% City) + Special Education Fund (1%)",
+        "Community Tax (Cedula): P5 basic + P1 per P1,000 income for individuals"
+      ]
+    },
+    {
+      "id": "tax-19",
+      "title": "Ease of Paying Taxes Act (EOPT 2024)",
+      "category": "Recent Tax Laws",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "File and pay anywhere; Annual P500 registration fee removed",
+        "Accrual basis and single INVOICE requirement for goods and services",
+        "Taxpayer classifications: Micro (<P3M), Small (P3M-P20M), Medium (P20M-P1B), Large (>=P1B)"
+      ]
+    },
+    {
+      "id": "tax-20",
+      "title": "Capital Markets Efficiency Promotion Act (CMEPA 2025)",
+      "category": "Recent Tax Laws",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Stock transaction tax (STT) reduced to 0.1% for domestic and foreign stock exchanges",
+        "Uniform 20% final tax on interest income; PERA employer contribution 150% deduction"
+      ]
+    }
+  ],
+  "MAS": [
+    {
+      "id": "mas-1",
+      "title": "Basic Concepts & Management Functions",
+      "category": "Foundations",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Financial (Reliability/Historical) vs Management Accounting (Relevance/Future)",
+        "Functions: Planning, Organizing, Controlling; Line authority vs Staff authority"
+      ]
+    },
+    {
+      "id": "mas-2",
+      "title": "Cost Behavior & Estimation Methods",
+      "category": "Cost Behavior",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "High-Low method: Variable cost per unit = Difference in Cost / Difference in Activity",
+        "Least-squares regression: line of best fit; Correlation coefficient r (-1 to +1)"
+      ]
+    },
+    {
+      "id": "mas-3",
+      "title": "Cost-Volume-Profit (CVP) Analysis",
+      "category": "CVP",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Break-Even Point (Units) = Fixed Costs / Unit Contribution Margin",
+        "Margin of Safety = Total Sales - Break-Even Sales = Profit / CM Ratio",
+        "Multi-product sales mix uses Weighted Average Contribution Margin (WACM)"
+      ]
+    },
+    {
+      "id": "mas-4",
+      "title": "Relevant Costing & Decision Making",
+      "category": "Decision Making",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Make or Buy: include opportunity costs for maximum purchase price",
+        "Special order: minimum price at full capacity vs excess capacity",
+        "Shutdown point = (Fixed Cost - Shutdown Cost) / Unit CM"
+      ]
+    },
+    {
+      "id": "mas-5",
+      "title": "Linear Programming & Optimization",
+      "category": "Decision Making",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Objective function: Maximize Z = UCM1(A) + UCM2(B)",
+        "Handles multiple constraints simultaneously"
+      ]
+    },
+    {
+      "id": "mas-6",
+      "title": "Budgeting & Master Budget Sequence",
+      "category": "Budgeting",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Master budget sequence: Sales forecast -> Production budget -> Cost of sales -> Financial budget",
+        "Zero-based budgeting re-examines all costs; Kaizen budgeting focuses on continuous reduction"
+      ]
+    },
+    {
+      "id": "mas-7",
+      "title": "Gross Profit Variance Analysis",
+      "category": "Variance Analysis",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Sales Price Variance = Actual Quantity x (Actual SP - Budgeted SP)",
+        "Cost Price Variance = Actual Quantity x (Actual CP - Budgeted CP)",
+        "Volume Variance = (Actual Quantity - Budgeted Quantity) x Budgeted SP/CP"
+      ]
+    },
+    {
+      "id": "mas-8",
+      "title": "Standard Costing - Materials & Labor Variances",
+      "category": "Variance Analysis",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Materials Price Variance (MPV) = AQ x (AP - SP); Quantity Variance (MQV) = SP x (AQ - SQ)",
+        "Labor Rate Variance (LRV) = AH x (AR - SR); Efficiency Variance (LEV) = SR x (AH - SH)"
+      ]
+    },
+    {
+      "id": "mas-9",
+      "title": "Standard Costing - Overhead Variances (2, 3, 4-Way)",
+      "category": "Variance Analysis",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "2-Way: Controllable variance vs Volume variance",
+        "3-Way: Spending, Efficiency, Volume; 4-Way: Variable spending, Fixed spending, Efficiency, Volume"
+      ]
+    },
+    {
+      "id": "mas-10",
+      "title": "Responsibility Accounting & Segment Reporting",
+      "category": "Performance",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Centers: Cost, Revenue, Profit, Investment",
+        "Segment margin evaluates segment performance; Performance margin evaluates manager"
+      ]
+    },
+    {
+      "id": "mas-11",
+      "title": "ROI, Residual Income & EVA",
+      "category": "Performance",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "ROI = Margin (Income/Sales) x Turnover (Sales/Assets) [Du Pont Technique]",
+        "Residual Income = Income - (Assets x Minimum ROI)",
+        "Economic Value Added (EVA) = NOPAT - (Total Capital x WACC)"
+      ]
+    },
+    {
+      "id": "mas-12",
+      "title": "Absorption Costing vs Variable Costing",
+      "category": "Costing",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Absorption treats FFOH as product cost; Variable treats FFOH as period expense",
+        "Memory key: P > S -> Income(AC) > Income(VC); Difference = Fixed FOH rate x (Production - Sales)"
+      ]
+    },
+    {
+      "id": "mas-13",
+      "title": "Transfer Pricing & Balanced Scorecard",
+      "category": "Performance",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Transfer price: Market price > Cost-based > Negotiated; prevents sub-optimization",
+        "Balanced Scorecard: Financial, Customer, Internal Business Process, Learning & Growth"
+      ]
+    },
+    {
+      "id": "mas-14",
+      "title": "Economics - Microeconomics & Macroeconomics",
+      "category": "Economics",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Elasticity of Demand: Ed > 1 (Elastic), Ed < 1 (Inelastic)",
+        "GDP Expenditure Approach = C + I + G + (X - M); Income Approach = WIRIPIT DAF",
+        "Fiscal policy (tax/spend) vs Monetary policy (open market operations, reserve ratio, interest)"
+      ]
+    },
+    {
+      "id": "mas-15",
+      "title": "Capital Budgeting - Non-Discounted Methods",
+      "category": "Capital Budgeting",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Payback Period = Net Investment / Annual Cash Inflow (measures liquidity, ignores time value)",
+        "Accounting Rate of Return (ARR) = Annual Net Income After Tax / Average Investment"
+      ]
+    },
+    {
+      "id": "mas-16",
+      "title": "Capital Budgeting - Cash Flow Cornerstones (TOWA-RAT & CWTS)",
+      "category": "Capital Budgeting",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Net Investment (TOWA-RAT): Tax on gain, Other costs, Working capital, Acquisition - Resale, Avoidable, Tax on loss",
+        "Termination Cash Flow (CWTS): Cost to remove, Working capital return, Tax on gain/loss, Salvage value"
+      ]
+    },
+    {
+      "id": "mas-17",
+      "title": "Capital Budgeting - Discounted Methods (NPV, PI, IRR)",
+      "category": "Capital Budgeting",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Net Present Value (NPV): PV of inflows - Net investment (reinvested at cost of capital)",
+        "Profitability Index (PI) = PV of inflows / Net investment (accept if PI > 1)",
+        "Internal Rate of Return (IRR): discount rate where NPV = 0"
+      ]
+    },
+    {
+      "id": "mas-18",
+      "title": "Cost of Capital & WACC",
+      "category": "Finance",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Cost of debt KD = Yield x (1 - Tax Rate)",
+        "Cost of equity KE = Risk-free rate + Beta x (Market Return - Risk-free) [CAPM]",
+        "Optimal capital structure minimizes WACC"
+      ]
+    },
+    {
+      "id": "mas-19",
+      "title": "Operating, Financial & Total Leverage",
+      "category": "Finance",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "DOL = CM / EBIT; DFL = EBIT / (EBIT - Fixed Financial Charges); DTL = DOL x DFL"
+      ]
+    },
+    {
+      "id": "mas-20",
+      "title": "Financial Statement Analysis & Ratios",
+      "category": "Finance",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Liquidity: Current ratio, Quick ratio (acid test)",
+        "Solvency: Debt ratio, Debt-to-Equity, Times Interest Earned",
+        "Activity: Inventory turnover, Receivable turnover, Cash conversion cycle (CCC)"
+      ]
+    },
+    {
+      "id": "mas-21",
+      "title": "Working Capital & Cash Management (Baumol)",
+      "category": "Working Capital",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Optimal cash balance (Baumol ECQ): sqrt(2 x Annual Demand x Transaction Cost / Opportunity Cost)",
+        "Float management: maximize payment float, minimize collection float"
+      ]
+    },
+    {
+      "id": "mas-22",
+      "title": "Inventory Management (EOQ & Reorder Point)",
+      "category": "Working Capital",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "EOQ = sqrt(2 x Annual Demand x Order Cost / Carrying Cost per unit)",
+        "Reorder point = Lead time usage + Safety stock"
+      ]
+    }
+  ],
+  "AUD": [
+    {
+      "id": "aud-1",
+      "title": "Assurance Fundamentals & 5 Elements (3SECC)",
+      "category": "Principles",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "3SECC: Three-party relationship, Subject matter, Evidence, Criteria, Conclusion",
+        "Reasonable assurance (Audit) expresses positive conclusion; Limited assurance (Review) expresses negative"
+      ]
+    },
+    {
+      "id": "aud-2",
+      "title": "Non-Assurance Engagements & Standards",
+      "category": "Principles",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Agreed-Upon Procedures (AUP): factual findings report, restricted distribution, no independence needed",
+        "Compilation: assisting management in presenting FS, no assurance, \"complied without audit\""
+      ]
+    },
+    {
+      "id": "aud-3",
+      "title": "Management Assertions (TOCCAC & ACERV)",
+      "category": "FS Audit",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Transactions [IS]: TOCCAC (Completeness, Occurrence, Classification, Accuracy, Cutoff)",
+        "Balances [BS]: ACERV (Completeness, Existence, Rights & Obligations, Valuation & Allocation)"
+      ]
+    },
+    {
+      "id": "aud-4",
+      "title": "Audit Evidence & Hierarchy of Reliability",
+      "category": "Evidence",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Sufficiency (quantity) vs Appropriateness (quality: relevance & reliability)",
+        "Reliability hierarchy: External third-party > Internal with good IC > Direct auditor inspection > Written > Oral"
+      ]
+    },
+    {
+      "id": "aud-5",
+      "title": "Audit Procedures - Vouching vs Tracing",
+      "category": "Evidence",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Vouching (Records to Source documents): tests for Existence / Occurrence (Overstatement)",
+        "Tracing (Source documents to Records): tests for Completeness (Understatement)"
+      ]
+    },
+    {
+      "id": "aud-6",
+      "title": "Preliminary Engagement Activities & Terms",
+      "category": "Engagement",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Auditor independence, competence, client integrity, predecessor auditor communication",
+        "Engagement letter establishes agreement between auditor and management on scope and duties"
+      ]
+    },
+    {
+      "id": "aud-7",
+      "title": "Audit Planning & Audit Risk Model",
+      "category": "Planning",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Overall audit strategy sets scope, timing, and direction; Detailed audit plan executes it",
+        "Audit Risk = Inherent Risk x Control Risk x Detection Risk",
+        "Detection risk has an INVERSE relationship with RoMM and Substantive Testing"
+      ]
+    },
+    {
+      "id": "aud-8",
+      "title": "Audit Materiality & Tolerable Misstatement",
+      "category": "Planning",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Planning materiality disaggregated into performance materiality / tolerable misstatement",
+        "Materiality has an INVERSE relationship with audit risk and sample size"
+      ]
+    },
+    {
+      "id": "aud-9",
+      "title": "Internal Control - 5 Components (CRIME)",
+      "category": "Internal Control",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "CRIME: Control Environment, Risk Assessment, Information & Communication, Monitoring, Existing Control Activities",
+        "Segregation of duties: ICARE (Independent checks, Custody, Authorization, Recording, Execution)"
+      ]
+    },
+    {
+      "id": "aud-10",
+      "title": "Test of Controls (ToC) & Substantive Testing",
+      "category": "Procedures",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "ToC evaluates operating effectiveness; Reliance approach vs Substantive approach",
+        "Substantive tests: Test of Details (Transactions vs Balances) and Substantive Analytical Procedures"
+      ]
+    },
+    {
+      "id": "aud-11",
+      "title": "External Confirmations (Positive vs Negative)",
+      "category": "Evidence",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Positive confirmation requires response whether agree or disagree (more reliable)",
+        "Negative confirmation responds only if disagree (used when RoMM is low, large number of small accounts)"
+      ]
+    },
+    {
+      "id": "aud-12",
+      "title": "Audit Sampling - Risks (Alpha vs Beta)",
+      "category": "Sampling",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Alpha Risk (Type 1): Under-reliance / Incorrect rejection -> affects Audit EFFICIENCY (extra work)",
+        "Beta Risk (Type 2): Over-reliance / Incorrect acceptance -> affects Audit EFFECTIVENESS (wrong opinion!)"
+      ]
+    },
+    {
+      "id": "aud-13",
+      "title": "Attribute Sampling & Variable Sampling",
+      "category": "Sampling",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Attribute sampling tests deviation rate in controls (SDR vs Tolerable Deviation Rate TDR)",
+        "Variable sampling tests monetary misstatement (Ratio estimation, Difference estimation, Mean-per-unit)"
+      ]
+    },
+    {
+      "id": "aud-14",
+      "title": "Auditing in a CIS Environment & CAATs",
+      "category": "IT Auditing",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Auditing around the computer (Black box) vs Auditing through the computer (White box)",
+        "CAATs: Test data, Integrated Test Facility (ITF dummy accounts), Parallel simulation, Snapshot"
+      ]
+    },
+    {
+      "id": "aud-15",
+      "title": "Quality Management for Audit Firms (PSQM 1 & 2)",
+      "category": "Quality",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "PSQM 1: System of Quality Management (firm-wide, risk-based approach, annual evaluation)",
+        "PSQM 2: Engagement Quality Review (EQR) for listed entities and high-risk engagements"
+      ]
+    },
+    {
+      "id": "aud-16",
+      "title": "Code of Ethics for CPAs (COBID & Threats I-FASS)",
+      "category": "Ethics",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Fundamental Principles: COBID (Confidentiality, Objectivity, Professional Behavior, Integrity, Diligence/Due Care)",
+        "Threats: I-FASS (Intimidation, Familiarity, Advocacy, Self-interest, Self-review)"
+      ]
+    },
+    {
+      "id": "aud-17",
+      "title": "Independence Rules & Cooling-Off Periods",
+      "category": "Ethics",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Independence in Mind vs Independence in Appearance",
+        "PIE lead engagement partner rotation: 7 years on-period; 5-year cooling off period"
+      ]
+    },
+    {
+      "id": "aud-18",
+      "title": "Transaction Cycles - Order to Cash (Revenue)",
+      "category": "Cycles",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Customer order -> Sales order -> Credit approval -> Shipping -> Billing (invoice) -> AR -> Cash collection",
+        "Separation: Credit approval separated from sales; Shipping separated from billing"
+      ]
+    },
+    {
+      "id": "aud-19",
+      "title": "Transaction Cycles - Procure to Pay & Payroll",
+      "category": "Cycles",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Procure to Pay: Requisition slip -> Purchase Order -> Receiving Report -> Vendor Invoice -> Voucher 3-way match",
+        "Payroll: Timekeeping segregated from HR and check disbursement; surprise paycheck distributions"
+      ]
+    },
+    {
+      "id": "aud-20",
+      "title": "Completing the Audit & Unrecorded Liabilities",
+      "category": "Completion",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Search for unrecorded liabilities examines subsequent cash disbursements after year-end",
+        "Inquiry of legal counsel for litigations and claims; Subsequent events review"
+      ]
+    },
+    {
+      "id": "aud-21",
+      "title": "Going Concern & Management Representations",
+      "category": "Completion",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Going concern assessment covers at least 12 months from reporting date",
+        "Management Representation Letter: dated same date as auditor's report; signed by CEO & CFO"
+      ]
+    },
+    {
+      "id": "aud-22",
+      "title": "Audit Reports & Modified Opinions",
+      "category": "Reporting",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Unqualified: Fairly presented in all material respects",
+        "Qualified: Material but not pervasive (\"Except for...\")",
+        "Adverse: Material AND pervasive misstatement (\"Does not present fairly\")",
+        "Disclaimer: Material AND pervasive scope limitation (\"We do not express an opinion\")"
+      ]
+    },
+    {
+      "id": "aud-23",
+      "title": "Key Audit Matters (KAM), EoM & Other Matter",
+      "category": "Reporting",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "KAM: Most significant matters communicated with TCwG (required for listed entities)",
+        "Emphasis of Matter (EoM): Already disclosed in notes, fundamental to users (GUESTS)",
+        "Other Matter (OM): Matters not presented/disclosed in FS relevant to understanding audit"
+      ]
+    },
+    {
+      "id": "aud-24",
+      "title": "Philippine Accountancy Act of 2004 (RA 9298)",
+      "category": "Profession",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Professional Regulatory Board of Accountancy (PRBoA): Chairman + 6 members",
+        "CPALE Rating: 75% general average with no subject below 65%; conditional if majority >=75%",
+        "CPD Law (RA 10912): 120 CPD units for BOA accreditation, 15 for license renewal"
+      ]
+    },
+    {
+      "id": "aud-25",
+      "title": "Fraud, Error & NOCLAR",
+      "category": "Fraud",
+      "mastered": false,
+      "label": "none",
+      "keyPoints": [
+        "Fraud triangle: Incentive/Pressure, Opportunity, Rationalization",
+        "Kiting: Concealing cash shortage by unrecorded inter-bank check transfer",
+        "Lapping: Postponing entry of cash collection to conceal stolen previous receipts",
+        "NOCLAR: Non-Compliance with Laws and Regulations responsibilities"
+      ]
+    }
+  ]
+};
+    const MOTIVATIONAL_QUOTES = [
+  "“May He give you the desire of your heart and make all your plans succeed.” — Hercules, CPA 2023",
+  "“Your dedication will always be rewarded, for the seeds of effort you sow will surely bloom in time.” — Hercules, CPA 2023",
+  "“If it's out of your hands, it deserves freedom from your mind too.” — Hercules, CPA 2023",
+  "“Trust in the Lord with all your heart and not lean on your own understanding.” — Proverbs 3:5",
+  "“Today's struggles are part of tomorrow's success story.” — Future CPA Study Habit",
+  "“One spin, one topic, one step closer to that CPA license!” — CPALE Review Buddy"
+];
+
+    const STORAGE_KEY = 'CPA_REVIEW_WHEEL_SINGLE_HTML_V1';
+    const SETTINGS_KEY = 'CPA_REVIEW_WHEEL_SETTINGS_SINGLE_HTML_V1';
+
+    // State
+    let activeSubjectId = 'FAR';
+    let allTopics = {};
+    let settings = {
+      soundEnabled: true,
+      skipAnimation: false,
+    };
+    let currentFilter = 'all';
+    let searchQuery = '';
+    let isSpinning = false;
+    let currentSelectedTopic = null;
+    let quoteIndex = 0;
+
+    // Load persisted state
+    try {
+      const savedTopics = localStorage.getItem(STORAGE_KEY);
+      if (savedTopics) {
+        allTopics = JSON.parse(savedTopics);
+      } else {
+        allTopics = JSON.parse(JSON.stringify(INITIAL_TOPICS));
+      }
+    } catch {
+      allTopics = JSON.parse(JSON.stringify(INITIAL_TOPICS));
+    }
+
+    try {
+      const savedSettings = localStorage.getItem(SETTINGS_KEY);
+      if (savedSettings) {
+        settings = Object.assign(settings, JSON.parse(savedSettings));
+      }
+    } catch {}
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(allTopics));
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+      } catch {}
+    }
+
+    // Audio Synthesizer (Web Audio API)
+    class SoundManager {
+      constructor() {
+        this.ctx = null;
+      }
+      getContext() {
+        if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+          const Cls = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new Cls();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+        return this.ctx;
+      }
+      playTick(vel = 1) {
+        if (!settings.soundEnabled) return;
+        try {
+          const ctx = this.getContext();
+          if (!ctx) return;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime((520 + Math.random() * 80) * (0.8 + 0.4 * vel), ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.035);
+          gain.gain.setValueAtTime(0.12 * Math.min(vel, 1.2), ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.035);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.04);
+        } catch {}
+      }
+      playCelebration() {
+        if (!settings.soundEnabled) return;
+        try {
+          const ctx = this.getContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((f, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            const t = now + idx * 0.07;
+            osc.frequency.setValueAtTime(f, t);
+            gain.gain.setValueAtTime(0.001, t);
+            gain.gain.linearRampToValueAtTime(0.15, t + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.56);
+          });
+        } catch {}
+      }
+      playPop() {
+        if (!settings.soundEnabled) return;
+        try {
+          const ctx = this.getContext();
+          if (!ctx) return;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.06);
+          gain.gain.setValueAtTime(0.1, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.07);
+        } catch {}
+      }
+    }
+    const sounds = new SoundManager();
+
+    // Confetti System
+    class ConfettiManager {
+      constructor() {
+        this.canvas = document.getElementById('confettiCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.animId = null;
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+      }
+      resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+      fire() {
+        const colors = ['#F43F5E', '#EC4899', '#8B5CF6', '#10B981', '#F59E0B', '#3B82F6', '#FED7AA'];
+        for (let i = 0; i < 90; i++) {
+          this.particles.push({
+            x: this.canvas.width / 2 + (Math.random() - 0.5) * 200,
+            y: this.canvas.height * 0.55,
+            vx: (Math.random() - 0.5) * 14,
+            vy: -(Math.random() * 14 + 6),
+            size: Math.random() * 9 + 4,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            rotation: Math.random() * 360,
+            rotationSpeed: (Math.random() - 0.5) * 12,
+            gravity: 0.35,
+            opacity: 1,
+          });
+        }
+        if (!this.animId) {
+          this.loop();
+        }
+      }
+      loop() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.particles.forEach((p, idx) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += p.gravity;
+          p.rotation += p.rotationSpeed;
+          p.opacity -= 0.008;
+
+          this.ctx.save();
+          this.ctx.translate(p.x, p.y);
+          this.ctx.rotate((p.rotation * Math.PI) / 180);
+          this.ctx.globalAlpha = Math.max(p.opacity, 0);
+          this.ctx.fillStyle = p.color;
+          this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
+          this.ctx.restore();
+        });
+
+        this.particles = this.particles.filter(p => p.opacity > 0 && p.y < this.canvas.height + 50);
+
+        if (this.particles.length > 0) {
+          this.animId = requestAnimationFrame(() => this.loop());
+        } else {
+          this.animId = null;
+          this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+      }
+    }
+    const confetti = new ConfettiManager();
+
+    // Wheel Canvas System
+    const SLICE_COLORS = [
+      '#FECDD3', '#FED7AA', '#FEF08A', '#BBF7D0', '#BAE6FD', '#DDD6FE',
+      '#FBCFE8', '#C7D2FE', '#A7F3D0', '#FDE68A', '#E9D5FF', '#CFFAFE'
+    ];
+    let wheelRotation = 0;
+    let wheelAnimFrame = null;
+    let lastPegIndex = -1;
+
+    function getActiveSubject() {
+      return SUBJECT_CONFIGS.find(s => s.id === activeSubjectId) || SUBJECT_CONFIGS[0];
+    }
+
+    function getActiveTopics() {
+      const list = allTopics[activeSubjectId] || [];
+      return list.filter(t => !t.mastered);
+    }
+
+    function drawWheel() {
+      const canvas = document.getElementById('wheelCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const r = Math.min(cx, cy) - 25;
+      const sub = getActiveSubject();
+      const topics = getActiveTopics();
+
+      ctx.clearRect(0, 0, w, h);
+
+      if (topics.length === 0) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = '#FFF1F2';
+        ctx.fill();
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = '#FECDD3';
+        ctx.stroke();
+
+        ctx.fillStyle = '#E11D48';
+        ctx.font = 'bold 22px Fredoka, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('All Topics Mastered! 🎉', cx, cy - 12);
+
+        ctx.fillStyle = '#64748B';
+        ctx.font = '14px Nunito, sans-serif';
+        ctx.fillText('Uncheck items to put them back in wheel', cx, cy + 18);
+        ctx.restore();
+        return;
+      }
+
+      const numSlices = topics.length;
+      const arc = (2 * Math.PI) / numSlices;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(wheelRotation);
+
+      // Slices
+      for (let i = 0; i < numSlices; i++) {
+        const angle = i * arc;
+        const topic = topics[i];
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, r, angle, angle + arc);
+        ctx.closePath();
+        ctx.fillStyle = SLICE_COLORS[i % SLICE_COLORS.length];
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.stroke();
+
+        // Text
+        ctx.save();
+        ctx.rotate(angle + arc / 2);
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#1E293B';
+        ctx.font = numSlices > 25 ? 'bold 11px Nunito, sans-serif' : numSlices > 15 ? 'bold 13px Nunito, sans-serif' : 'bold 15px Nunito, sans-serif';
+
+        let title = topic.title;
+        const maxLen = numSlices > 20 ? 18 : 26;
+        if (title.length > maxLen) {
+          title = title.substring(0, maxLen - 1) + '…';
+        }
+        if (topic.label === 'critical') title = '🚨 ' + title;
+        else if (topic.label === 'comfortable') title = '🌿 ' + title;
+
+        ctx.fillText(title, r - 22, 0);
+        ctx.restore();
+      }
+
+      // Outer rim
+      ctx.beginPath();
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.lineWidth = 8;
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(0, 0, r + 4, 0, Math.PI * 2);
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = sub.accentColor;
+      ctx.stroke();
+
+      // Outer pearls
+      const numDots = Math.max(16, numSlices * 2);
+      for (let d = 0; d < numDots; d++) {
+        const dotAngle = (d * 2 * Math.PI) / numDots;
+        const dx = Math.cos(dotAngle) * (r + 2);
+        const dy = Math.sin(dotAngle) * (r + 2);
+        ctx.beginPath();
+        ctx.arc(dx, dy, 4, 0, Math.PI * 2);
+        ctx.fillStyle = d % 2 === 0 ? '#FFFFFF' : '#FFF7ED';
+        ctx.fill();
+      }
+
+      ctx.restore();
+
+      // Center Hub Button
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 46, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.shadowColor = 'rgba(0,0,0,0.15)';
+      ctx.shadowBlur = 10;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 38, 0, Math.PI * 2);
+      ctx.fillStyle = sub.accentColor;
+      ctx.fill();
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 15px Fredoka, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('SPIN', 0, -4);
+      ctx.font = '12px Fredoka, sans-serif';
+      ctx.fillText('✨', 0, 14);
+
+      ctx.restore();
+
+      // Pointer / Arrow at Right Edge (3 o'clock)
+      ctx.save();
+      ctx.translate(cx + r + 8, cy);
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(24, -14);
+      ctx.lineTo(24, 14);
+      ctx.closePath();
+      ctx.fillStyle = sub.accentColor;
+      ctx.shadowColor = 'rgba(0,0,0,0.2)';
+      ctx.shadowBlur = 6;
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(16, 0, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function spinTheWheel() {
+      const topics = getActiveTopics();
+      if (isSpinning || topics.length === 0) return;
+
+      const sub = getActiveSubject();
+
+      // Skip Animation Mode
+      if (settings.skipAnimation) {
+        const randIdx = Math.floor(Math.random() * topics.length);
+        const winner = topics[randIdx];
+        sounds.playCelebration();
+        confetti.fire();
+        openTopicModal(winner);
+        return;
+      }
+
+      isSpinning = true;
+      document.getElementById('spinBtn').disabled = true;
+
+      const numSlices = topics.length;
+      const arc = (2 * Math.PI) / numSlices;
+      const targetIndex = Math.floor(Math.random() * numSlices);
+      const randomWithinSlice = (Math.random() * 0.7 + 0.15) * arc;
+      const desiredFinalAngle = -(targetIndex * arc + randomWithinSlice);
+
+      const extraSpins = (Math.floor(Math.random() * 4) + 6) * 2 * Math.PI;
+      const startRot = wheelRotation;
+      const currentNorm = startRot % (2 * Math.PI);
+      const targetRot = startRot + (extraSpins + ((desiredFinalAngle - currentNorm) % (2 * Math.PI) + 2 * Math.PI));
+
+      const duration = 4600;
+      const startTime = performance.now();
+
+      function animate(time) {
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 3.8);
+
+        wheelRotation = startRot + (targetRot - startRot) * easeOut;
+
+        const currentPeg = Math.floor((wheelRotation / arc) % numSlices);
+        if (currentPeg !== lastPegIndex) {
+          lastPegIndex = currentPeg;
+          sounds.playTick(1 - progress);
+        }
+
+        drawWheel();
+
+        if (progress < 1) {
+          wheelAnimFrame = requestAnimationFrame(animate);
+        } else {
+          isSpinning = false;
+          document.getElementById('spinBtn').disabled = false;
+          const winner = topics[targetIndex];
+          sounds.playCelebration();
+          confetti.fire();
+          openTopicModal(winner);
+        }
+      }
+
+      wheelAnimFrame = requestAnimationFrame(animate);
+    }
+
+    // Modal Manager
+    function openTopicModal(topic) {
+      currentSelectedTopic = topic;
+      const sub = getActiveSubject();
+      const backdrop = document.getElementById('topicModalBackdrop');
+      const header = document.getElementById('topicModalHeader');
+      const titleEl = document.getElementById('modalTopicTitle');
+      const iconEl = document.getElementById('modalSubjectIcon');
+      const card = document.getElementById('topicModalCard');
+
+      header.style.backgroundColor = sub.accentColor;
+      card.style.borderColor = sub.accentColor;
+      titleEl.textContent = topic.title;
+      iconEl.textContent = sub.icon;
+
+      // Badges
+      const badgesContainer = document.getElementById('modalBadgesContainer');
+      badgesContainer.innerHTML = '';
+      
+      const subBadge = document.createElement('span');
+      subBadge.className = 'badge-pill';
+      subBadge.style.background = sub.lightColor;
+      subBadge.style.color = sub.accentColor;
+      subBadge.textContent = sub.name + ' • ' + (topic.category || 'Reviewer');
+      badgesContainer.appendChild(subBadge);
+
+      if (topic.mastered) {
+        const mBadge = document.createElement('span');
+        mBadge.className = 'badge-pill';
+        mBadge.style.background = '#D1FAE5';
+        mBadge.style.color = '#065F46';
+        mBadge.textContent = '✓ Mastered (Off Wheel)';
+        badgesContainer.appendChild(mBadge);
+      } else {
+        const aBadge = document.createElement('span');
+        aBadge.className = 'badge-pill';
+        aBadge.style.background = '#FEF3C7';
+        aBadge.style.color = '#92400E';
+        aBadge.textContent = '🎡 In Wheel';
+        badgesContainer.appendChild(aBadge);
+      }
+
+      if (topic.label === 'critical') {
+        const cBadge = document.createElement('span');
+        cBadge.className = 'tag-critical';
+        cBadge.textContent = '🚨 Critical';
+        badgesContainer.appendChild(cBadge);
+      } else if (topic.label === 'comfortable') {
+        const cBadge = document.createElement('span');
+        cBadge.className = 'tag-comfortable';
+        cBadge.textContent = '🌿 Comfortable';
+        badgesContainer.appendChild(cBadge);
+      } else if (topic.label === 'reviewing') {
+        const cBadge = document.createElement('span');
+        cBadge.className = 'tag-reviewing';
+        cBadge.textContent = '📖 Reviewing';
+        badgesContainer.appendChild(cBadge);
+      }
+
+      // Key points
+      const pointsList = document.getElementById('modalKeyPointsList');
+      pointsList.innerHTML = '';
+      if (topic.keyPoints && topic.keyPoints.length > 0) {
+        topic.keyPoints.forEach(pt => {
+          const li = document.createElement('li');
+          li.textContent = pt;
+          pointsList.appendChild(li);
+        });
+      } else {
+        const li = document.createElement('li');
+        li.textContent = 'Key topic in ' + sub.name + ' CPA board exam syllabus.';
+        pointsList.appendChild(li);
+      }
+
+      // Notes
+      document.getElementById('modalNotesTextarea').value = topic.notes || '';
+
+      // Update button labels
+      updateModalButtonStates(topic);
+
+      backdrop.classList.add('open');
+    }
+
+    function updateModalButtonStates(topic) {
+      const checkIcon = document.getElementById('modalMasteredCheckIcon');
+      const labelEl = document.getElementById('modalMasteredLabel');
+      const toggleBtn = document.getElementById('modalToggleMasteredBtn');
+
+      if (topic.mastered) {
+        checkIcon.textContent = '✅';
+        labelEl.textContent = 'Mastered! Click to Put Back in Wheel';
+        toggleBtn.style.background = '#ECFDF5';
+        toggleBtn.style.color = '#065F46';
+        toggleBtn.style.borderColor = '#10B981';
+      } else {
+        checkIcon.textContent = '⬜';
+        labelEl.textContent = 'Mark as Mastered (Remove from Wheel)';
+        toggleBtn.style.background = '#FFF';
+        toggleBtn.style.color = '#1E293B';
+        toggleBtn.style.borderColor = '#E2E8F0';
+      }
+
+      // Labels buttons active state
+      ['btnLabelCritical', 'btnLabelComfortable', 'btnLabelReviewing'].forEach(id => {
+        document.getElementById(id).classList.remove('active');
+      });
+      if (topic.label === 'critical') document.getElementById('btnLabelCritical').classList.add('active');
+      if (topic.label === 'comfortable') document.getElementById('btnLabelComfortable').classList.add('active');
+      if (topic.label === 'reviewing') document.getElementById('btnLabelReviewing').classList.add('active');
+    }
+
+    function closeTopicModal() {
+      document.getElementById('topicModalBackdrop').classList.remove('open');
+      renderAll();
+    }
+
+    // Render Everything
+    function renderTabs() {
+      const bar = document.getElementById('subjectTabsBar');
+      bar.innerHTML = '';
+
+      SUBJECT_CONFIGS.forEach(sub => {
+        const isActive = sub.id === activeSubjectId;
+        const list = allTopics[sub.id] || [];
+        const mastered = list.filter(t => t.mastered).length;
+        const total = list.length;
+        const activeCount = total - mastered;
+
+        const btn = document.createElement('button');
+        btn.className = 'tab-btn' + (isActive ? ' active' : '');
+        if (isActive) {
+          btn.style.borderColor = sub.accentColor;
+          btn.style.color = sub.accentColor;
+        }
+
+        btn.innerHTML = `
+          <span style="font-size:1.15rem;">${sub.icon}</span>
+          <div style="text-align:left;">
+            <div style="font-family:'Fredoka'; font-weight:700; line-height:1.1;">${sub.name}</div>
+            <div style="font-size:0.65rem; color:#94A3B8;">${activeCount} in wheel (${mastered}/${total})</div>
+          </div>
+        `;
+
+        btn.addEventListener('click', () => {
+          sounds.playPop();
+          activeSubjectId = sub.id;
+          renderAll();
+        });
+
+        bar.appendChild(btn);
+      });
+    }
+
+    function renderBanner() {
+      const sub = getActiveSubject();
+      const banner = document.getElementById('subjectBanner');
+      banner.style.background = `linear-gradient(135deg, ${sub.accentColor}, ${sub.accentColor}cc, #A855F7)`;
+      document.getElementById('bannerSubjectName').textContent = `${sub.name} — ${sub.fullName}`;
+      document.getElementById('bannerSubjectDesc').textContent = sub.description;
+      document.getElementById('quoteText').textContent = MOTIVATIONAL_QUOTES[quoteIndex];
+      document.getElementById('wheelSubjectIcon').textContent = sub.icon;
+      document.getElementById('wheelSubjectTitle').textContent = `${sub.name} Topic Wheel`;
+      document.getElementById('spinBtn').style.backgroundColor = sub.accentColor;
+    }
+
+    function renderStats() {
+      let totalAll = 0;
+      let masteredAll = 0;
+      Object.values(allTopics).forEach(list => {
+        list.forEach(t => {
+          totalAll++;
+          if (t.mastered) masteredAll++;
+        });
+      });
+      const pct = totalAll > 0 ? Math.round((masteredAll / totalAll) * 100) : 0;
+      document.getElementById('overallStatsText').textContent = `${masteredAll} of ${totalAll} board exam topics mastered`;
+      document.getElementById('overallProgressFill').style.width = pct + '%';
+      document.getElementById('overallPercentText').textContent = pct + '%';
+
+      // Current subject stats
+      const currList = allTopics[activeSubjectId] || [];
+      const currMastered = currList.filter(t => t.mastered).length;
+      const currTotal = currList.length;
+      const currActive = currTotal - currMastered;
+      const currPct = currTotal > 0 ? Math.round((currMastered / currTotal) * 100) : 0;
+
+      document.getElementById('wheelCountBadge').textContent = `${currActive} / ${currTotal} active`;
+      document.getElementById('drawerActiveCount').textContent = `${currActive} in wheel`;
+      document.getElementById('drawerProgressText').textContent = `${currMastered}/${currTotal} Mastered (${currPct}%)`;
+
+      // Filter pills counts
+      document.getElementById('countAll').textContent = currTotal;
+      document.getElementById('countInWheel').textContent = currActive;
+      document.getElementById('countMastered').textContent = currMastered;
+      document.getElementById('countCritical').textContent = currList.filter(t => t.label === 'critical').length;
+      document.getElementById('countComfortable').textContent = currList.filter(t => t.label === 'comfortable').length;
+    }
+
+    function renderChecklist() {
+      const container = document.getElementById('topicListContainer');
+      container.innerHTML = '';
+      const list = allTopics[activeSubjectId] || [];
+
+      const filtered = list.filter(t => {
+        const matchesQuery = t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (t.category && t.category.toLowerCase().includes(searchQuery.toLowerCase()));
+        if (!matchesQuery) return false;
+
+        if (currentFilter === 'in-wheel') return !t.mastered;
+        if (currentFilter === 'mastered') return t.mastered;
+        if (currentFilter === 'critical') return t.label === 'critical';
+        if (currentFilter === 'comfortable') return t.label === 'comfortable';
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:2rem; font-size:0.8rem; color:#94A3B8;">No topics found matching search/filter.</div>';
+        return;
+      }
+
+      filtered.forEach(topic => {
+        const row = document.createElement('div');
+        row.className = 'topic-row' + (topic.mastered ? ' mastered' : '');
+
+        // Checkbox
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'topic-checkbox';
+        cb.checked = topic.mastered;
+        cb.title = topic.mastered ? 'Uncheck to return to wheel' : 'Check to mark as mastered (removes from wheel)';
+        cb.addEventListener('change', () => {
+          sounds.playPop();
+          topic.mastered = cb.checked;
+          saveState();
+          renderAll();
+        });
+
+        // Content
+        const contentDiv = document.createElement('div');
+        contentDiv.style.flex = '1';
+        contentDiv.style.cursor = 'pointer';
+        contentDiv.style.paddingLeft = '0.65rem';
+
+        const titleDiv = document.createElement('div');
+        titleDiv.style.display = 'flex';
+        titleDiv.style.alignItems = 'center';
+        titleDiv.style.gap = '0.35rem';
+        titleDiv.style.flexWrap = 'wrap';
+
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'topic-title font-cute';
+        titleSpan.style.fontSize = '0.85rem';
+        titleSpan.style.fontWeight = '700';
+        titleSpan.textContent = topic.title;
+        titleDiv.appendChild(titleSpan);
+
+        if (topic.label === 'critical') {
+          const badge = document.createElement('span');
+          badge.className = 'tag-critical';
+          badge.textContent = '🚨 Critical';
+          titleDiv.appendChild(badge);
+        } else if (topic.label === 'comfortable') {
+          const badge = document.createElement('span');
+          badge.className = 'tag-comfortable';
+          badge.textContent = '🌿 Comfortable';
+          titleDiv.appendChild(badge);
+        } else if (topic.label === 'reviewing') {
+          const badge = document.createElement('span');
+          badge.className = 'tag-reviewing';
+          badge.textContent = '📖 Reviewing';
+          titleDiv.appendChild(badge);
+        }
+
+        if (topic.notes) {
+          const nBadge = document.createElement('span');
+          nBadge.style.fontSize = '0.65rem';
+          nBadge.style.color = '#B45309';
+          nBadge.style.background = '#FEF3C7';
+          nBadge.style.padding = '0.1rem 0.35rem';
+          nBadge.style.borderRadius = '4px';
+          nBadge.textContent = '📝 Note';
+          titleDiv.appendChild(nBadge);
+        }
+
+        contentDiv.appendChild(titleDiv);
+
+        if (topic.category) {
+          const cat = document.createElement('div');
+          cat.style.fontSize = '0.7rem';
+          cat.style.color = '#94A3B8';
+          cat.textContent = topic.category;
+          contentDiv.appendChild(cat);
+        }
+
+        contentDiv.addEventListener('click', () => {
+          sounds.playPop();
+          openTopicModal(topic);
+        });
+
+        // Delete button for custom added items
+        row.appendChild(cb);
+        row.appendChild(contentDiv);
+
+        if (topic.addedByUser) {
+          const delBtn = document.createElement('button');
+          delBtn.textContent = '🗑️';
+          delBtn.style.border = 'none';
+          delBtn.style.background = 'transparent';
+          delBtn.style.cursor = 'pointer';
+          delBtn.style.padding = '0.2rem';
+          delBtn.title = 'Delete custom topic';
+          delBtn.addEventListener('click', () => {
+            sounds.playPop();
+            allTopics[activeSubjectId] = allTopics[activeSubjectId].filter(t => t.id !== topic.id);
+            saveState();
+            renderAll();
+          });
+          row.appendChild(delBtn);
+        }
+
+        container.appendChild(row);
+      });
+    }
+
+    function renderAll() {
+      renderTabs();
+      renderBanner();
+      renderStats();
+      renderChecklist();
+      drawWheel();
+    }
+
+    // Attach Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      // Toolbar toggles
+      const fastBtn = document.getElementById('toggleFastSpinBtn');
+      if (settings.skipAnimation) fastBtn.classList.add('active');
+      fastBtn.addEventListener('click', () => {
+        sounds.playPop();
+        settings.skipAnimation = !settings.skipAnimation;
+        fastBtn.classList.toggle('active', settings.skipAnimation);
+        saveState();
+      });
+
+      const soundBtn = document.getElementById('toggleSoundBtn');
+      function updateSoundBtn() {
+        document.getElementById('soundIcon').textContent = settings.soundEnabled ? '🔊' : '🔇';
+        document.getElementById('soundLabel').textContent = settings.soundEnabled ? 'Sound' : 'Muted';
+      }
+      updateSoundBtn();
+      soundBtn.addEventListener('click', () => {
+        settings.soundEnabled = !settings.soundEnabled;
+        updateSoundBtn();
+        if (settings.soundEnabled) sounds.playPop();
+        saveState();
+      });
+
+      // Quote cycler
+      document.getElementById('quoteBox').addEventListener('click', () => {
+        sounds.playPop();
+        quoteIndex = (quoteIndex + 1) % MOTIVATIONAL_QUOTES.length;
+        document.getElementById('quoteText').textContent = MOTIVATIONAL_QUOTES[quoteIndex];
+      });
+
+      // Spin buttons
+      document.getElementById('spinBtn').addEventListener('click', spinTheWheel);
+      document.getElementById('wheelContainer').addEventListener('click', spinTheWheel);
+
+      // Drawer Collapse Toggle
+      const drawerHeader = document.getElementById('drawerHeader');
+      const drawerBody = document.getElementById('drawerBody');
+      const drawerChevron = document.getElementById('drawerChevron');
+      drawerHeader.addEventListener('click', () => {
+        sounds.playPop();
+        const isCollapsed = drawerBody.classList.toggle('collapsed');
+        drawerChevron.textContent = isCollapsed ? '▼' : '▲';
+      });
+
+      // Search input
+      document.getElementById('topicSearchInput').addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderChecklist();
+      });
+
+      // Filter pills
+      document.querySelectorAll('#filterPillsContainer .pill-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          sounds.playPop();
+          document.querySelectorAll('#filterPillsContainer .pill-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilter = btn.dataset.filter;
+          renderChecklist();
+        });
+      });
+
+      // Add topic form toggle
+      document.getElementById('openAddTopicBtn').addEventListener('click', () => {
+        sounds.playPop();
+        document.getElementById('addTopicFormCard').style.display = 'flex';
+      });
+      document.getElementById('closeAddTopicBtn').addEventListener('click', () => {
+        document.getElementById('addTopicFormCard').style.display = 'none';
+      });
+
+      // Add topic submit
+      document.getElementById('submitNewTopicBtn').addEventListener('click', () => {
+        const title = document.getElementById('newTopicTitle').value.trim();
+        const category = document.getElementById('newTopicCategory').value.trim() || 'Custom Added';
+        const label = document.getElementById('newTopicTagSelect').value;
+
+        if (!title) return;
+        sounds.playPop();
+
+        const newItem = {
+          id: activeSubjectId.toLowerCase() + '-custom-' + Date.now(),
+          title,
+          category,
+          mastered: false,
+          label,
+          notes: '',
+          keyPoints: ['Custom study topic added by reviewee.'],
+          addedByUser: true,
+        };
+
+        allTopics[activeSubjectId].unshift(newItem);
+        document.getElementById('newTopicTitle').value = '';
+        document.getElementById('newTopicCategory').value = '';
+        document.getElementById('addTopicFormCard').style.display = 'none';
+
+        saveState();
+        renderAll();
+      });
+
+      // Reset subject mastery
+      document.getElementById('resetSubjectMasteryBtn').addEventListener('click', () => {
+        sounds.playPop();
+        allTopics[activeSubjectId].forEach(t => t.mastered = false);
+        saveState();
+        renderAll();
+      });
+
+      // Modal Events
+      document.getElementById('closeTopicModalBtn').addEventListener('click', closeTopicModal);
+      document.getElementById('modalDoneBtn').addEventListener('click', closeTopicModal);
+
+      document.getElementById('modalToggleMasteredBtn').addEventListener('click', () => {
+        if (!currentSelectedTopic) return;
+        sounds.playPop();
+        currentSelectedTopic.mastered = !currentSelectedTopic.mastered;
+        saveState();
+        updateModalButtonStates(currentSelectedTopic);
+        if (currentSelectedTopic.mastered) {
+          confetti.fire();
+          setTimeout(closeTopicModal, 400);
+        }
+      });
+
+      document.getElementById('btnLabelCritical').addEventListener('click', () => {
+        if (!currentSelectedTopic) return;
+        sounds.playPop();
+        currentSelectedTopic.label = currentSelectedTopic.label === 'critical' ? 'none' : 'critical';
+        saveState();
+        updateModalButtonStates(currentSelectedTopic);
+      });
+
+      document.getElementById('btnLabelComfortable').addEventListener('click', () => {
+        if (!currentSelectedTopic) return;
+        sounds.playPop();
+        currentSelectedTopic.label = currentSelectedTopic.label === 'comfortable' ? 'none' : 'comfortable';
+        saveState();
+        updateModalButtonStates(currentSelectedTopic);
+      });
+
+      document.getElementById('btnLabelReviewing').addEventListener('click', () => {
+        if (!currentSelectedTopic) return;
+        sounds.playPop();
+        currentSelectedTopic.label = currentSelectedTopic.label === 'reviewing' ? 'none' : 'reviewing';
+        saveState();
+        updateModalButtonStates(currentSelectedTopic);
+      });
+
+      document.getElementById('saveNotesBtn').addEventListener('click', () => {
+        if (!currentSelectedTopic) return;
+        sounds.playPop();
+        currentSelectedTopic.notes = document.getElementById('modalNotesTextarea').value;
+        saveState();
+        alert('Notes saved! ✨');
+      });
+
+      document.getElementById('modalSpinAgainBtn').addEventListener('click', () => {
+        closeTopicModal();
+        setTimeout(spinTheWheel, 200);
+      });
+
+      // Backup & Restore
+      document.getElementById('openBackupBtn').addEventListener('click', () => {
+        sounds.playPop();
+        document.getElementById('backupModalBackdrop').classList.add('open');
+      });
+      document.getElementById('closeBackupModalBtn').addEventListener('click', () => {
+        document.getElementById('backupModalBackdrop').classList.remove('open');
+      });
+
+      document.getElementById('downloadBackupBtn').addEventListener('click', () => {
+        sounds.playPop();
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
+          version: '1.0',
+          topics: allTopics,
+          settings,
+        }, null, 2));
+        const dlAnchor = document.createElement('a');
+        dlAnchor.setAttribute("href", dataStr);
+        dlAnchor.setAttribute("download", "cpa-reviewer-wheel-backup.json");
+        document.body.appendChild(dlAnchor);
+        dlAnchor.click();
+        dlAnchor.remove();
+      });
+
+      document.getElementById('copyBackupBtn').addEventListener('click', () => {
+        sounds.playPop();
+        navigator.clipboard.writeText(JSON.stringify({ topics: allTopics, settings }, null, 2));
+        alert('Backup copied to clipboard! 📋');
+      });
+
+      document.getElementById('applyRestoreBtn').addEventListener('click', () => {
+        try {
+          const text = document.getElementById('pasteBackupTextarea').value.trim();
+          if (!text) return;
+          const parsed = JSON.parse(text);
+          if (parsed && parsed.topics) {
+            allTopics = parsed.topics;
+            if (parsed.settings) settings = parsed.settings;
+            saveState();
+            renderAll();
+            document.getElementById('backupModalBackdrop').classList.remove('open');
+            sounds.playCelebration();
+            alert('Progress restored successfully! ✨');
+          }
+        } catch {
+          alert('Invalid backup JSON format.');
+        }
+      });
+
+      document.getElementById('uploadBackupInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const parsed = JSON.parse(event.target.result);
+            if (parsed && parsed.topics) {
+              allTopics = parsed.topics;
+              if (parsed.settings) settings = parsed.settings;
+              saveState();
+              renderAll();
+              document.getElementById('backupModalBackdrop').classList.remove('open');
+              sounds.playCelebration();
+              alert('Progress restored successfully from file! ✨');
+            }
+          } catch {
+            alert('Invalid file format.');
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      document.getElementById('fullResetBtn').addEventListener('click', () => {
+        if (confirm('Are you sure you want to reset all 6 subjects back to original reviewer topics?')) {
+          sounds.playPop();
+          allTopics = JSON.parse(JSON.stringify(INITIAL_TOPICS));
+          saveState();
+          renderAll();
+          document.getElementById('backupModalBackdrop').classList.remove('open');
+        }
+      });
+
+      // Initial Render
+      renderAll();
+    });
+  </script>
+</body>
+</html>
